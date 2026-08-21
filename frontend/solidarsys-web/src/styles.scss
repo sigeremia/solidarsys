@@ -1,0 +1,16 @@
+/* Tailwind CSS v4 */
+@import "tailwindcss";
+
+/* PrimeNG 21 — estilos base (tema configurado via providePrimeNG no app.config.ts) */
+@import "primeicons/primeicons.css";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+}

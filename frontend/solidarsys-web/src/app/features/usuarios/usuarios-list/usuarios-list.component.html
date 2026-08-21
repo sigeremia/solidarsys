@@ -1,0 +1,108 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="p-6">
+  <!-- Cabeçalho -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800">Usuários</h1>
+      <p class="text-slate-500 text-sm mt-0.5">Gerencie os usuários do sistema</p>
+    </div>
+    @if (isAdmin) {
+      <p-button label="Novo usuário" icon="pi pi-plus" (onClick)="abrirNovo()" />
+    }
+  </div>
+
+  <!-- Filtro de busca -->
+  <div class="mb-4">
+    <span class="p-input-icon-left w-full max-w-sm">
+      <i class="pi pi-search"></i>
+      <input
+        pInputText
+        type="text"
+        [(ngModel)]="busca"
+        (ngModelChange)="onBusca()"
+        placeholder="Buscar por nome ou e-mail…"
+        class="w-full" />
+    </span>
+  </div>
+
+  <!-- Tabela -->
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <p-table
+      [value]="usuarios()"
+      [loading]="carregando()"
+      [lazy]="true"
+      [totalRecords]="total()"
+      [rows]="tamanhoPagina"
+      [paginator]="true"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      (onPage)="onPage($event)"
+      styleClass="p-datatable-sm">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Nome</th>
+          <th>E-mail</th>
+          <th>Nível</th>
+          <th>Setor</th>
+          <th>Status</th>
+          <th>Cadastro</th>
+          <th class="w-28">Ações</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-usuario>
+        <tr>
+          <td class="font-medium text-slate-800">{{ usuario.nome }}</td>
+          <td class="text-slate-500 text-sm">{{ usuario.email }}</td>
+          <td>
+            <p-tag
+              [value]="nivelLabel(usuario.nivelAcesso)"
+              [severity]="nivelSeverity(usuario.nivelAcesso)" />
+          </td>
+          <td class="text-slate-500 text-sm">{{ usuario.setor ?? '—' }}</td>
+          <td>
+            <p-tag
+              [value]="usuario.ativo ? 'Ativo' : 'Inativo'"
+              [severity]="usuario.ativo ? 'success' : 'secondary'" />
+          </td>
+          <td class="text-slate-500 text-sm">{{ usuario.dataCriacao | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <div class="flex gap-1">
+              @if (isAdmin) {
+                <p-button
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="secondary"
+                  pTooltip="Editar"
+                  (onClick)="abrirEdicao(usuario)" />
+                <p-button
+                  [icon]="usuario.ativo ? 'pi pi-ban' : 'pi pi-check-circle'"
+                  [rounded]="true"
+                  [text]="true"
+                  [severity]="usuario.ativo ? 'danger' : 'success'"
+                  [pTooltip]="usuario.ativo ? 'Inativar' : 'Ativar'"
+                  (onClick)="confirmarAlternarAtivo(usuario)" />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="text-center text-slate-400 py-8">Nenhum usuário encontrado.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- Dialog de formulário -->
+<app-usuario-form
+  [aberto]="formAberto()"
+  [usuario]="usuarioEmEdicao()"
+  (fechou)="formAberto.set(false)"
+  (salvo)="onFormSalvo()" />

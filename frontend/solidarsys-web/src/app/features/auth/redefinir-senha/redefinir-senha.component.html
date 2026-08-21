@@ -1,0 +1,99 @@
+<div class="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+  <div class="w-full max-w-md">
+
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-600 mb-4">
+        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </div>
+      <h1 class="text-2xl font-bold text-slate-800">SolidarSYS</h1>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+
+      @if (concluido()) {
+        <div class="text-center">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 mb-4">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h2 class="text-lg font-semibold text-slate-800 mb-2">Senha redefinida!</h2>
+          <p class="text-sm text-slate-500">Você será redirecionado para o login em instantes...</p>
+        </div>
+
+      } @else if (!token()) {
+        <div class="text-center">
+          <p-message severity="error" text="Link inválido. Solicite um novo link de recuperação." styleClass="w-full mb-4" />
+          <a routerLink="/esqueceu-senha" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+            Solicitar novo link
+          </a>
+        </div>
+
+      } @else {
+        <div class="mb-1">
+          <h2 class="text-lg font-semibold text-slate-800">Criar nova senha</h2>
+          <p class="text-sm text-slate-500 mt-1">
+            A senha deve ter no mínimo 8 caracteres, com maiúsculas, minúsculas, número e símbolo.
+          </p>
+        </div>
+
+        @if (erro()) {
+          <p-message severity="error" [text]="erro()!" styleClass="w-full mt-4" />
+        }
+
+        <form [formGroup]="form" (ngSubmit)="redefinir()" novalidate class="flex flex-col gap-4 mt-6">
+
+          <div class="flex flex-col gap-1">
+            <label for="novaSenha" class="text-sm font-medium text-slate-700">Nova senha</label>
+            <p-password
+              inputId="novaSenha"
+              formControlName="novaSenha"
+              placeholder="Mínimo 8 caracteres"
+              [toggleMask]="true"
+              [feedback]="true"
+              autocomplete="new-password"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+            />
+            @if (form.get('novaSenha')?.touched && form.get('novaSenha')?.hasError('required')) {
+              <small class="text-red-500">Nova senha é obrigatória.</small>
+            }
+            @if (form.get('novaSenha')?.touched && form.get('novaSenha')?.hasError('minlength')) {
+              <small class="text-red-500">A senha deve ter ao menos 8 caracteres.</small>
+            }
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label for="confirmarSenha" class="text-sm font-medium text-slate-700">Confirmar nova senha</label>
+            <p-password
+              inputId="confirmarSenha"
+              formControlName="confirmarSenha"
+              placeholder="Repita a nova senha"
+              [feedback]="false"
+              [toggleMask]="true"
+              autocomplete="new-password"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+            />
+            @if (form.get('confirmarSenha')?.touched && form.hasError('senhasDivergem')) {
+              <small class="text-red-500">As senhas não coincidem.</small>
+            }
+          </div>
+
+          <p-button
+            type="submit"
+            label="Salvar nova senha"
+            styleClass="w-full mt-2"
+            [loading]="carregando()"
+            [disabled]="carregando()"
+          />
+
+        </form>
+      }
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,38 @@
+# ==========================================
+# Frontend — Node / Angular
+# ==========================================
+frontend/solidarsys-web/node_modules/
+frontend/solidarsys-web/dist/
+frontend/solidarsys-web/.angular/
+
+# ==========================================
+# Backend — .NET
+# ==========================================
+backend/**/bin/
+backend/**/obj/
+backend/**/*.user
+backend/**/*.suo
+backend/.vs/
+
+# Segredos — NUNCA commitar
+backend/**/appsettings.Production.json
+backend/**/appsettings.Staging.json
+
+# EF Core migrations geradas localmente (opcional — remova se quiser versionar)
+# backend/**/Migrations/
+
+# ==========================================
+# IDEs
+# ==========================================
+.vs/
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
+
+# ==========================================
+# Logs e temporários
+# ==========================================
+*.log
+*.tmp
+npm-debug.log*

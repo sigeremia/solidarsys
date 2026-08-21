@@ -1,0 +1,27 @@
+@import "primeicons/primeicons.css";
+@import "./utilities.css";
+
+:root {
+  --p-primary-50:  #f0fdfa;
+  --p-primary-100: #ccfbf1;
+  --p-primary-200: #99f6e4;
+  --p-primary-300: #5eead4;
+  --p-primary-400: #2dd4bf;
+  --p-primary-500: #14b8a6;
+  --p-primary-600: #0d9488;
+  --p-primary-700: #0f766e;
+  --p-primary-800: #115e59;
+  --p-primary-900: #134e4a;
+  --p-primary-950: #042f2e;
+  --p-primary-color: var(--p-primary-500);
+  --p-primary-contrast-color: #ffffff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+}

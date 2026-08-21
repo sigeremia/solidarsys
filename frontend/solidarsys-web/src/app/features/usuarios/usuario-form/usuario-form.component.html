@@ -1,0 +1,82 @@
+<p-dialog
+  [visible]="aberto"
+  [header]="modoEdicao ? 'Editar usuário' : 'Novo usuário'"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '480px' }"
+  (onHide)="fechar()">
+
+  @if (erro()) {
+    <p-message severity="error" [text]="erro()!" styleClass="w-full mb-4" />
+  }
+
+  <form [formGroup]="form" novalidate class="flex flex-col gap-4 pt-2">
+
+    <!-- Nome -->
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium text-slate-700">Nome completo</label>
+      <input pInputText formControlName="nome" placeholder="Nome completo" class="w-full" />
+      @if (form.get('nome')?.touched && form.get('nome')?.invalid) {
+        <small class="text-red-500">Nome é obrigatório.</small>
+      }
+    </div>
+
+    <!-- E-mail e CPF (apenas criação) -->
+    @if (!modoEdicao) {
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-slate-700">E-mail</label>
+        <input pInputText type="email" formControlName="email" placeholder="email@exemplo.com" class="w-full" />
+        @if (form.get('email')?.touched && form.get('email')?.invalid) {
+          <small class="text-red-500">E-mail válido é obrigatório.</small>
+        }
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium text-slate-700">CPF (só números)</label>
+          <input pInputText formControlName="cpf" placeholder="00000000000" maxlength="11" class="w-full" />
+          @if (form.get('cpf')?.touched && form.get('cpf')?.invalid) {
+            <small class="text-red-500">CPF inválido (11 dígitos).</small>
+          }
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium text-slate-700">Senha inicial</label>
+          <p-password formControlName="senha" [feedback]="false" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full" />
+          @if (form.get('senha')?.touched && form.get('senha')?.invalid) {
+            <small class="text-red-500">Mínimo 8 caracteres.</small>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Data de nascimento -->
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium text-slate-700">Data de nascimento</label>
+      <input pInputText type="date" formControlName="dataNascimento" class="w-full" />
+      @if (form.get('dataNascimento')?.touched && form.get('dataNascimento')?.invalid) {
+        <small class="text-red-500">Data de nascimento é obrigatória.</small>
+      }
+    </div>
+
+    <!-- Nível de acesso -->
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium text-slate-700">Nível de acesso</label>
+      <p-select
+        formControlName="nivelAcesso"
+        [options]="niveisAcesso"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Selecione..."
+        styleClass="w-full" />
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="fechar()" />
+    <p-button
+      [label]="modoEdicao ? 'Salvar alterações' : 'Criar usuário'"
+      (onClick)="salvar()"
+      [loading]="carregando()" />
+  </ng-template>
+</p-dialog>
