@@ -22,13 +22,14 @@ public class GmailSmtpEmailService(IConfiguration config, ILogger<GmailSmtpEmail
         string tokenBruto,
         CancellationToken ct = default)
     {
-        var link = $"{_urlFrontend}/redefinir-senha?token={Uri.EscapeDataString(tokenBruto)}";
+        var link = $"http://localhost:4200/redefinir-senha?token={Uri.EscapeDataString(tokenBruto)}";
 
         var mensagem = new MimeMessage();
         mensagem.From.Add(new MailboxAddress(_nomeRemetente, _username));
         mensagem.To.Add(MailboxAddress.Parse(destinatario));
         mensagem.Subject = "SolidarSYS — Recuperação de Senha";
-
+        Console.WriteLine($"EMAIL: {_username}");
+        Console.WriteLine($"PASSWORD LENGTH: {_password.Length}");
         var corpo = new BodyBuilder
         {
             HtmlBody = $"""
@@ -50,11 +51,14 @@ public class GmailSmtpEmailService(IConfiguration config, ILogger<GmailSmtpEmail
                 </div>
                 """
         };
-
+        Console.WriteLine($"EMAIL: {_username}");
+        Console.WriteLine($"PASSWORD LENGTH: {_password.Length}");
         mensagem.Body = corpo.ToMessageBody();
 
         using var smtp = new SmtpClient();
         await smtp.ConnectAsync(_host, _port, SecureSocketOptions.StartTls, ct);
+        Console.WriteLine($"EMAIL: {_username}");
+        Console.WriteLine($"PASSWORD LENGTH: {_password.Length}");
         await smtp.AuthenticateAsync(_username, _password, ct);
         await smtp.SendAsync(mensagem, ct);
         await smtp.DisconnectAsync(quit: true, ct);
