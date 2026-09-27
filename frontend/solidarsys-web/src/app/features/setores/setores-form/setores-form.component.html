@@ -1,0 +1,47 @@
+<p-dialog
+  [visible]="aberto"
+  [header]="modoEdicao ? 'Editar setor' : 'Nova setor'"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '480px' }"
+  (onHide)="fechar()">
+
+  @if (erro()) {
+    <p-message severity="error" [text]="erro()!" styleClass="w-full mb-4" />
+  }
+
+  <form [formGroup]="form" novalidate class="flex flex-col gap-4 pt-2">
+
+    <!-- Nome -->
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium text-slate-700">Nome da setor</label>
+      <input pInputText formControlName="nome" placeholder="Nome da setor" class="w-full" />
+      @if (form.get('nome')?.touched && form.get('nome')?.invalid) {
+        <small class="text-red-500">Nome é obrigatório.</small>
+      }
+    </div>
+
+    <!-- E-mail e CPF (apenas criação) -->
+    @if (!modoEdicao) {
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium text-slate-700">Descrição</label>
+          <input pInputText formControlName="descricao" placeholder="Descrição do setor" class="w-full" />
+          @if (form.get('descricao')?.touched && form.get('descricao')?.invalid) {
+            <small class="text-red-500">Descrição é obrigatória.</small>
+          }
+        </div>
+      </div>
+    }
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="fechar()" />
+    <p-button
+      [label]="modoEdicao ? 'Salvar alterações' : 'Criar setor'"
+      (onClick)="salvar()"
+      [loading]="carregando()" />
+  </ng-template>
+</p-dialog>

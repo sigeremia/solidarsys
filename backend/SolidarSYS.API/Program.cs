@@ -12,13 +12,17 @@ using SolidarSYS.API.Middleware;
 using SolidarSYS.Application.Auth.Interfaces;
 using SolidarSYS.Application.Auth.Services;
 using SolidarSYS.Application.Comunidades.Interfaces;
+using SolidarSYS.Application.Setores.Interfaces;
 using SolidarSYS.Application.Comunidades.Services;
+using SolidarSYS.Application.Setores.Services;
 using SolidarSYS.Application.Usuarios.Interfaces;
 using SolidarSYS.Application.Usuarios.Services;
 using SolidarSYS.Infrastructure.Auth;
 using SolidarSYS.Infrastructure.Data;
 using SolidarSYS.Infrastructure.Email;
 using SolidarSYS.Infrastructure.Repositories;
+using SolidarSYS.Infrastructure.Setores;
+using SolidarSYS.API.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,12 +50,14 @@ else
 // ───── Dependências da aplicação ─────
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IComunidadeRepository, ComunidadeRepository>();
+builder.Services.AddScoped<ISetoresRepository, SetoresRepository>();
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
 builder.Services.AddScoped<IEmailService, GmailSmtpEmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IComunidadeService, ComunidadeService>();
+builder.Services.AddScoped<ISetoresService, SetoresService>();
 
 // ───── JWT Authentication ─────
 var jwtKey = builder.Configuration["Jwt:SecretKey"]!;

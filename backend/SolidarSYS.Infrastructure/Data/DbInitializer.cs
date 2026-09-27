@@ -43,6 +43,20 @@ public static class DbInitializer
             );");
     }
 
+    private static async Task EnsureSetoresTableExistsAsync(SolidarSysDbContext db) {
+        if (db.Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            return;
+
+        await db.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE IF NOT EXISTS setores (
+                id_setores INTEGER PRIMARY KEY AUTOINCREMENT,
+                nome TEXT NOT NULL,
+                descricao TEXT,
+                data_criacao TEXT NOT NULL,
+                ativo INTEGER NOT NULL
+            );");
+    }
+
     private static async Task SeedAsync(SolidarSysDbContext db)
     {
         // Setor administrativo
