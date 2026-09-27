@@ -23,7 +23,7 @@ public class AuthController(IAuthService authService) : ControllerBase
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None,
             Expires = DateTimeOffset.UtcNow.AddDays(7)
         });
 
@@ -43,7 +43,12 @@ public class AuthController(IAuthService authService) : ControllerBase
             await authService.LogoutAsync(hash, ct);
         }
 
-        Response.Cookies.Delete(RefreshTokenCookie);
+        Response.Cookies.Delete(RefreshTokenCookie, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None
+        });
         return NoContent();
     }
 

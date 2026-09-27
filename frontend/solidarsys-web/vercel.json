@@ -1,0 +1,18 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/login", "destination": "/index.html" },
+    { "source": "/esqueceu-senha", "destination": "/index.html" },
+    { "source": "/redefinir-senha", "destination": "/index.html" },
+    { "source": "/dashboard", "destination": "/index.html" },
+    { "source": "/usuarios", "destination": "/index.html" },
+    { "source": "/beneficiarios", "destination": "/index.html" },
+    { "source": "/doadores", "destination": "/index.html" },
+    { "source": "/visitas", "destination": "/index.html" },
+    { "source": "/comunidades", "destination": "/index.html" },
+    { "source": "/setores", "destination": "/index.html" },
+    { "source": "/mapa", "destination": "/index.html" },
+    { "source": "/relatorios", "destination": "/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
