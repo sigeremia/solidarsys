@@ -17,6 +17,7 @@ using SolidarSYS.Application.Comunidades.Services;
 using SolidarSYS.Application.Setores.Services;
 using SolidarSYS.Application.Usuarios.Interfaces;
 using SolidarSYS.Application.Usuarios.Services;
+using SolidarSYS.Domain.Enums;
 using SolidarSYS.Infrastructure.Auth;
 using SolidarSYS.Infrastructure.Data;
 using SolidarSYS.Infrastructure.Email;
@@ -44,7 +45,9 @@ if (dbProvider == "sqlite")
 else
 {
     builder.Services.AddDbContext<SolidarSysDbContext>(opt =>
-        opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+        opt.UseNpgsql(
+            builder.Configuration.GetConnectionString("DefaultConnection"),
+            npgsql => npgsql.MapEnum<NivelAcesso>("nivel_acesso")));
 }
 
 // ───── Dependências da aplicação ─────
