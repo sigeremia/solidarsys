@@ -1,0 +1,100 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="p-6">
+  <!-- Cabeçalho -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800">Setores</h1>
+      <p class="text-slate-500 text-sm mt-0.5">Gerencie as setores do sistema</p>
+    </div>
+    @if (isAdmin) {
+      <p-button label="Novo setor" icon="pi pi-plus" (onClick)="abrirNovo()" />
+    }
+  </div>
+
+  <!-- Filtro de busca -->
+  <div class="mb-4">
+    <p-iconfield class="p-input-icon-left w-full max-w-sm">
+      <p-inputicon class="pi pi-search" />
+      <input
+        pInputText
+        type="text"
+        [(ngModel)]="busca"
+        (ngModelChange)="onBusca()"
+        placeholder="Buscar por nome"
+        class="w-full" />
+    </p-iconfield>
+  </div>
+
+  <!-- Tabela -->
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <p-table
+      [value]="setores()"
+      [loading]="carregando()"
+      [lazy]="true"
+      [totalRecords]="total()"
+      [rows]="tamanhoPagina"
+      [paginator]="true"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      (onPage)="onPage($event)"
+      styleClass="p-datatable-sm">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Status</th>
+          <th>Nome</th>
+          <th>Descrição</th>
+          <th>Data de criação</th>
+          <th class="w-28">Ações</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-setor>
+        <tr>
+          <td>
+            <p-tag
+              [value]="setor.ativo ? 'Ativa' : 'Inativa'"
+              [severity]="setor.ativo ? 'success' : 'secondary'" />
+          </td>
+          <td class="font-medium text-slate-800">{{ setor.nome }}</td>
+          <td class="text-slate-500 text-sm">{{ setor.descricao }}</td>
+          <td class="text-slate-500 text-sm">{{ setor.dataCriacao | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <div class="flex gap-1">
+              @if (isAdmin) {
+                <p-button
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="secondary"
+                  pTooltip="Editar"
+                  (onClick)="abrirEdicao(setor)" />
+                <p-button
+                  [icon]="setor.ativo ? 'pi pi-ban' : 'pi pi-check-circle'"
+                  [rounded]="true"
+                  [text]="true"
+                  [severity]="setor.ativa ? 'danger' : 'success'"
+                  [pTooltip]="setor.ativa ? 'Inativar' : 'Ativar'"
+                  (onClick)="confirmarAlternarAtivo(setor)" />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="text-center text-slate-400 py-8">Nenhum setor encontrada.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- Dialog de formulário -->
+<app-setores-form
+  [aberto]="formAberto()"
+  [setores]="setorEmEdicao()"
+  (fechou)="formAberto.set(false)"
+  (salvo)="onFormSalvo()" />
