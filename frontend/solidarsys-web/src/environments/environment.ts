@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://solidarsys-api.onrender.com/api',
+  apiUrl: 'https://solidarsys.onrender.com/api',
 };
