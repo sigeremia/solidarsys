@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { catchError, map, of, switchMap } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
 export const authGuard: CanActivateFn = () => {
@@ -8,8 +9,11 @@ export const authGuard: CanActivateFn = () => {
 
   if (auth.isAuthenticated()) return true;
 
-  // Tenta refresh silencioso antes de redirecionar
-  return router.createUrlTree(['/login']);
+  return auth.refresh().pipe(
+    switchMap(() => auth.carregarUsuarioAtual()),
+    map(() => true),
+    catchError(() => of(router.createUrlTree(['/login'])))
+  );
 };
 
 export const guestGuard: CanActivateFn = () => {

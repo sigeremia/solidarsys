@@ -12,6 +12,7 @@ public class SolidarSysDbContext(DbContextOptions<SolidarSysDbContext> options) 
     public DbSet<SetorPermissao> SetorPermissoes => Set<SetorPermissao>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<TokenRecuperacaoSenha> TokensRecuperacaoSenha => Set<TokenRecuperacaoSenha>();
+    public DbSet<Comunidade> Comunidades => Set<Comunidade>();
 
     private bool IsPostgres => Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL";
 
@@ -107,6 +108,20 @@ public class SolidarSysDbContext(DbContextOptions<SolidarSysDbContext> options) 
             e.Property(t => t.CriadoEm).HasColumnName("criado_em").IsRequired();
             e.HasIndex(t => t.Token).IsUnique();
             e.HasOne(t => t.Usuario).WithMany(u => u.TokensRecuperacao).HasForeignKey(t => t.IdUsuario);
+        });
+
+        modelBuilder.Entity<Comunidade>(e =>
+        {
+            e.ToTable("comunidades");
+            e.HasKey(c => c.IdComunidade);
+            e.Property(c => c.IdComunidade).HasColumnName("id_comunidade");
+            if (IsPostgres) e.Property(c => c.IdComunidade).UseIdentityByDefaultColumn();
+            e.Property(c => c.Nome).HasColumnName("nome").HasMaxLength(150).IsRequired();
+            e.Property(c => c.Regiao).HasColumnName("regiao").HasMaxLength(150).IsRequired();
+            e.Property(c => c.Descricao).HasColumnName("descricao");
+            e.Property(c => c.DataCriacao).HasColumnName("data_criacao").IsRequired();
+            e.Property(c => c.Ativa).HasColumnName("ativa").IsRequired();
+            e.Property(c => c.TotalBeneficiarios).HasColumnName("total_beneficiarios").IsRequired();
         });
     }
 }

@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -10,6 +11,8 @@ using Scalar.AspNetCore;
 using SolidarSYS.API.Middleware;
 using SolidarSYS.Application.Auth.Interfaces;
 using SolidarSYS.Application.Auth.Services;
+using SolidarSYS.Application.Comunidades.Interfaces;
+using SolidarSYS.Application.Comunidades.Services;
 using SolidarSYS.Application.Usuarios.Interfaces;
 using SolidarSYS.Application.Usuarios.Services;
 using SolidarSYS.Infrastructure.Auth;
@@ -20,7 +23,9 @@ using SolidarSYS.Infrastructure.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 // ───── Controllers e validação ─────
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<SolidarSYS.Application.Auth.Validators.LoginRequestValidator>();
 
@@ -40,11 +45,13 @@ else
 
 // ───── Dependências da aplicação ─────
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IComunidadeRepository, ComunidadeRepository>();
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
 builder.Services.AddScoped<IEmailService, GmailSmtpEmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IComunidadeService, ComunidadeService>();
 
 // ───── JWT Authentication ─────
 var jwtKey = builder.Configuration["Jwt:SecretKey"]!;

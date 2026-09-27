@@ -34,11 +34,11 @@ export const routes: Routes = [
         path: 'usuarios',
         loadComponent: () => import('./features/usuarios/usuarios-list/usuarios-list.component').then(m => m.UsuariosListComponent),
       },
-      // Rotas futuras (Passo 3+)
+      // Rotas futuras
       { path: 'beneficiarios',  loadComponent: () => import('./features/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
       { path: 'doadores',       loadComponent: () => import('./features/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
       { path: 'visitas',        loadComponent: () => import('./features/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
-      { path: 'comunidades',    loadComponent: () => import('./features/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
+      { path: 'comunidades',    loadComponent: () => import('./features/comunidades/comunidades-list/comunidades-list.component').then(m => m.ComunidadesListComponent) },
       { path: 'mapa',           loadComponent: () => import('./features/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
       { path: 'setores',        loadComponent: () => import('./features/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
       { path: 'relatorios',     loadComponent: () => import('./features/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
