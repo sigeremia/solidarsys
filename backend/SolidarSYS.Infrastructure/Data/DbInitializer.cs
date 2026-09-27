@@ -58,6 +58,60 @@ public static class DbInitializer
             await db.SaveChangesAsync();
         }
 
+        var setoresDeTeste = new[]
+        {
+            new Setor
+            {
+                Nome = "Atendimento Social",
+                Descricao = "Acolhimento e acompanhamento de famílias atendidas.",
+                Ativo = true,
+            },
+            new Setor
+            {
+                Nome = "Saúde Comunitária",
+                Descricao = "Ações de prevenção, orientação e apoio em saúde.",
+                Ativo = true,
+            },
+            new Setor
+            {
+                Nome = "Educação e Capacitação",
+                Descricao = "Atividades educativas, oficinas e formação profissional.",
+                Ativo = true,
+            },
+            new Setor
+            {
+                Nome = "Segurança Alimentar",
+                Descricao = "Organização de doações e apoio alimentar às comunidades.",
+                Ativo = true,
+            },
+            new Setor
+            {
+                Nome = "Comunicação e Mobilização",
+                Descricao = "Comunicação institucional e mobilização comunitária.",
+                Ativo = true,
+            },
+            new Setor
+            {
+                Nome = "Gestão de Voluntariado",
+                Descricao = "Integração, orientação e acompanhamento de voluntários.",
+                Ativo = true,
+            },
+            new Setor
+            {
+                Nome = "Financeiro",
+                Descricao = "Controle financeiro, prestação de contas e orçamento.",
+                Ativo = true,
+            },
+        };
+
+        foreach (var setor in setoresDeTeste)
+        {
+            if (!await db.Setores.AnyAsync(s => s.Nome == setor.Nome))
+                db.Setores.Add(setor);
+        }
+
+        await db.SaveChangesAsync();
+
         // Usuário administrador padrão — senha: Admin@123
         if (!await db.Usuarios.AnyAsync(u => u.Email == "admin@solidarsys.org"))
         {

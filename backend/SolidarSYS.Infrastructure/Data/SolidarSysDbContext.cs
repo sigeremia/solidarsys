@@ -33,7 +33,10 @@ public class SolidarSysDbContext(DbContextOptions<SolidarSysDbContext> options) 
             e.Property(u => u.Senha).HasColumnName("senha").HasMaxLength(255).IsRequired();
             e.Property(u => u.DataNascimento).HasColumnName("data_nascimento").IsRequired();
             e.Property(u => u.NivelAcesso).HasColumnName("nivel_acesso").IsRequired();
-            if (!IsPostgres) e.Property(u => u.NivelAcesso).HasConversion<string>();
+            if (IsPostgres)
+                e.Property(u => u.NivelAcesso).HasColumnType("nivel_acesso");
+            else
+                e.Property(u => u.NivelAcesso).HasConversion<string>();
             e.Property(u => u.IdSetor).HasColumnName("id_setor");
             e.Property(u => u.Cpf).HasColumnName("cpf").HasMaxLength(11).IsRequired();
             e.Property(u => u.Ativo).HasColumnName("ativo").IsRequired();
