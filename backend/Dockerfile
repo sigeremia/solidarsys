@@ -12,7 +12,6 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
 COPY --from=build /app/publish ./
-COPY backend/certs/rds-ca.pem ./certs/rds-ca.pem
 
 ENV ASPNETCORE_HTTP_PORTS=10000
 EXPOSE 10000
