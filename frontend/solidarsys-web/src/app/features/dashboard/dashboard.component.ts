@@ -15,7 +15,6 @@ import { AuthService } from '../../core/services/auth.service';
         <p class="text-slate-500 text-sm mt-0.5">Bem-vindo ao SolidarSYS</p>
       </div>
 
-      <!-- Cards de estatísticas — placeholder para Passo 7 (gráficos) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         @for (card of cards; track card.label) {
           <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
@@ -26,7 +25,6 @@ import { AuthService } from '../../core/services/auth.service';
               </div>
             </div>
             <p class="text-2xl font-bold text-slate-800">—</p>
-            <p class="text-xs text-slate-400 mt-1">Disponível no Passo 7</p>
           </div>
         }
       </div>
@@ -34,8 +32,7 @@ import { AuthService } from '../../core/services/auth.service';
       <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex items-center justify-center h-48 text-slate-400">
         <div class="text-center">
           <i class="pi pi-chart-bar text-4xl mb-3 block"></i>
-          <p class="font-medium">Gráficos em construção</p>
-          <p class="text-sm">Serão implementados no Passo 7 — Relatórios e Dashboard</p>
+          <p class="font-medium">Relatórios</p>
         </div>
       </div>
     </div>

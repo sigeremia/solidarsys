@@ -22,14 +22,12 @@ public class GmailSmtpEmailService(IConfiguration config, ILogger<GmailSmtpEmail
         string tokenBruto,
         CancellationToken ct = default)
     {
-        var link = $"http://localhost:4200/redefinir-senha?token={Uri.EscapeDataString(tokenBruto)}";
+        var link = $"{_urlFrontend.TrimEnd('/')}/redefinir-senha?token={Uri.EscapeDataString(tokenBruto)}";
 
         var mensagem = new MimeMessage();
         mensagem.From.Add(new MailboxAddress(_nomeRemetente, _username));
         mensagem.To.Add(MailboxAddress.Parse(destinatario));
         mensagem.Subject = "SolidarSYS — Recuperação de Senha";
-        Console.WriteLine($"EMAIL: {_username}");
-        Console.WriteLine($"PASSWORD LENGTH: {_password.Length}");
         var corpo = new BodyBuilder
         {
             HtmlBody = $"""
