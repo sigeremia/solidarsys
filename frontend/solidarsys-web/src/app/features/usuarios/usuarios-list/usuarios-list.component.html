@@ -15,8 +15,8 @@
 
   <!-- Filtro de busca -->
   <div class="mb-4">
-    <span class="p-input-icon-left w-full max-w-sm">
-      <i class="pi pi-search"></i>
+    <p-iconfield class="w-full max-w-sm" iconPosition="left">
+      <p-inputicon class="pi pi-search" />
       <input
         pInputText
         type="text"
@@ -24,7 +24,7 @@
         (ngModelChange)="onBusca()"
         placeholder="Buscar por nome ou e-mail…"
         class="w-full" />
-    </span>
+    </p-iconfield>
   </div>
 
   <!-- Tabela -->

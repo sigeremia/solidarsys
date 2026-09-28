@@ -1,5 +1,5 @@
-import { NivelAcesso } from '../../../core/models/auth.model';
 
+import { NivelAcesso } from '../../../core/models/auth.model';
 export interface UsuarioListItem {
   id: number;
   nome: string;
@@ -32,4 +32,15 @@ export interface AtualizarUsuarioRequest {
   dataNascimento: string;
   nivelAcesso: NivelAcesso;
   idSetor: number | null;
+}
+
+export interface UsuarioListItem {
+  id: number;
+  nome: string;
+  email: string;
+  dataNascimento: string;   // 🆕 adicionar esta linha
+  nivelAcesso: NivelAcesso;
+  setor: string | null;
+  ativo: boolean;
+  dataCriacao: string;
 }

@@ -140,9 +140,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseCors("SolidarSYS");
 app.UseHttpsRedirection();
 app.UseRateLimiter();
-app.UseCors("SolidarSYS");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

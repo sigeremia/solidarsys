@@ -77,5 +77,5 @@ public class UsuarioService(IUsuarioRepository repo, IPasswordHasher passwordHas
     }
 
     private static UsuarioListItemDto Mapear(Usuario u) =>
-        new(u.IdUsuario, u.Nome, u.Email, u.NivelAcesso, u.Setor?.Nome, u.Ativo, u.DataCriacao);
+        new(u.IdUsuario, u.Nome, u.Email, u.DataNascimento, u.NivelAcesso, u.Setor?.Nome, u.Ativo, u.DataCriacao);
 }

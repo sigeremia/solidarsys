@@ -36,7 +36,7 @@ export class UsuarioFormComponent implements OnChanges {
   get modoEdicao(): boolean { return !!this.usuario; }
 
   niveisAcesso = [
-    { label: 'Administrador', value: 'ADMINISTRADOR' as NivelAcesso },
+   // { label: 'Administrador', value: 'ADMINISTRADOR' as NivelAcesso },
     { label: 'Gestor',        value: 'GESTOR' as NivelAcesso },
     { label: 'Operador',      value: 'OPERADOR' as NivelAcesso },
     { label: 'Voluntário',    value: 'VOLUNTARIO' as NivelAcesso },
@@ -51,7 +51,7 @@ export class UsuarioFormComponent implements OnChanges {
     if (this.modoEdicao) {
       this.form = this.fb.group({
         nome:           [this.usuario!.nome, [Validators.required, Validators.maxLength(150)]],
-        dataNascimento: ['', Validators.required],
+        dataNascimento: [this.usuario!.dataNascimento, Validators.required],
         nivelAcesso:    [this.usuario!.nivelAcesso, Validators.required],
         idSetor:        [null],
       });
@@ -59,7 +59,11 @@ export class UsuarioFormComponent implements OnChanges {
       this.form = this.fb.group({
         nome:           ['', [Validators.required, Validators.maxLength(150)]],
         email:          ['', [Validators.required, Validators.email]],
-        senha:          ['', [Validators.required, Validators.minLength(8)]],
+        senha:          ['', [
+          Validators.required,
+          Validators.minLength(8),
+          Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).+$/),
+        ]],
         cpf:            ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
         dataNascimento: ['', Validators.required],
         nivelAcesso:    ['OPERADOR' as NivelAcesso, Validators.required],
@@ -80,10 +84,23 @@ export class UsuarioFormComponent implements OnChanges {
     obs.subscribe({
       next: () => { this.carregando.set(false); this.salvo.emit(); },
       error: e => {
-        this.erro.set(e?.error?.mensagem ?? e?.error ?? 'Erro ao salvar. Verifique os dados.');
+        this.erro.set(this.extrairMensagemErro(e));
         this.carregando.set(false);
       },
     });
+  }
+
+  private extrairMensagemErro(e: any): string {
+    const body = e?.error;
+    if (!body) return 'Erro ao salvar. Verifique os dados.';
+    if (typeof body === 'string') return body;
+    if (body.mensagem) return body.mensagem;
+    if (body.errors) {
+      const mensagens = Object.values(body.errors).flat() as string[];
+      if (mensagens.length) return mensagens.join(' ');
+    }
+    if (body.title) return body.title;
+    return 'Erro ao salvar. Verifique os dados.';
   }
 
   fechar(): void { this.fechou.emit(); }

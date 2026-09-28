@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
@@ -20,7 +22,7 @@ import { NivelAcesso } from '../../../core/models/auth.model';
   standalone: true,
   imports: [
     CommonModule, FormsModule, TableModule, ButtonModule,
-    InputTextModule, TagModule, ToastModule, TooltipModule, ConfirmDialogModule,
+    InputTextModule, IconFieldModule, InputIconModule, TagModule, ToastModule, TooltipModule, ConfirmDialogModule,
     UsuarioFormComponent,
   ],
   providers: [MessageService, ConfirmationService],

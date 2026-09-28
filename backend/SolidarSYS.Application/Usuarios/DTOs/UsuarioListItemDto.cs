@@ -6,6 +6,7 @@ public record UsuarioListItemDto(
     int Id,
     string Nome,
     string Email,
+    DateOnly DataNascimento,
     NivelAcesso NivelAcesso,
     string? Setor,
     bool Ativo,

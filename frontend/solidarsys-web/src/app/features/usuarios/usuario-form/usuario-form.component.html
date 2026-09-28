@@ -43,7 +43,7 @@
           <label class="text-sm font-medium text-slate-700">Senha inicial</label>
           <p-password formControlName="senha" [feedback]="false" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full" />
           @if (form.get('senha')?.touched && form.get('senha')?.invalid) {
-            <small class="text-red-500">Mínimo 8 caracteres.</small>
+            <small class="text-red-500">Mínimo 8 caracteres, com maiúscula, minúscula, número e símbolo.</small>
           }
         </div>
       </div>
@@ -63,11 +63,12 @@
       <label class="text-sm font-medium text-slate-700">Nível de acesso</label>
       <p-select
         formControlName="nivelAcesso"
-        [options]="niveisAcesso"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="Selecione..."
-        styleClass="w-full" />
+  [options]="niveisAcesso"
+  optionLabel="label"
+  optionValue="value"
+  placeholder="Selecione..."
+  appendTo="body"
+  styleClass="w-full" />
     </div>
 
   </form>
