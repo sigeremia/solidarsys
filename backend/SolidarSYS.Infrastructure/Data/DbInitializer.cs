@@ -22,6 +22,7 @@ public static class DbInitializer
 
         // SQLite pode deixar um arquivo já existente sem todas as tabelas em dev local.stentes.
         await EnsureCommunityTableExistsAsync(db);
+        await EnsureBeneficiariosTableExistsAsync(db);
 
         await SeedAsync(db);
     }
@@ -56,6 +57,26 @@ public static class DbInitializer
                 ativo INTEGER NOT NULL
             );");
     }
+    private static async Task EnsureBeneficiariosTableExistsAsync(SolidarSysDbContext db)
+    {
+    if (db.Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+        return;
+
+    await db.Database.ExecuteSqlRawAsync(@"
+        CREATE TABLE IF NOT EXISTS beneficiarios (
+            id_beneficiario INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            cpf TEXT NOT NULL,
+            data_nascimento TEXT NOT NULL,
+            endereco TEXT NOT NULL,
+            id_comunidade INTEGER NOT NULL,
+            total_membros_familia INTEGER NOT NULL,
+            ativo INTEGER NOT NULL,
+            data_criacao TEXT NOT NULL,
+            FOREIGN KEY (id_comunidade) REFERENCES comunidades(id_comunidade)
+        );
+        CREATE UNIQUE INDEX IF NOT EXISTS ix_beneficiarios_cpf ON beneficiarios(cpf);");
+}
 
     private static async Task SeedAsync(SolidarSysDbContext db)
     {
@@ -288,6 +309,7 @@ public static class DbInitializer
             );
 
             await db.SaveChangesAsync();
+            await EnsureBeneficiariosTableExistsAsync(db);
         }
     }
 }

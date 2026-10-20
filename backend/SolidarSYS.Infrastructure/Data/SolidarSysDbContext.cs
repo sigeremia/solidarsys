@@ -13,6 +13,7 @@ public class SolidarSysDbContext(DbContextOptions<SolidarSysDbContext> options) 
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<TokenRecuperacaoSenha> TokensRecuperacaoSenha => Set<TokenRecuperacaoSenha>();
     public DbSet<Comunidade> Comunidades => Set<Comunidade>();
+    public DbSet<Beneficiario> Beneficiarios => Set<Beneficiario>();
 
     private bool IsPostgres => Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL";
 
@@ -125,6 +126,23 @@ public class SolidarSysDbContext(DbContextOptions<SolidarSysDbContext> options) 
             e.Property(c => c.DataCriacao).HasColumnName("data_criacao").IsRequired();
             e.Property(c => c.Ativa).HasColumnName("ativa").IsRequired();
             e.Property(c => c.TotalBeneficiarios).HasColumnName("total_beneficiarios").IsRequired();
+        });
+        modelBuilder.Entity<Beneficiario>(e =>
+        {
+           e.ToTable("beneficiarios");
+           e.HasKey(b => b.IdBeneficiario);
+           e.Property(b => b.IdBeneficiario).HasColumnName("id_beneficiario");
+           if (IsPostgres) e.Property(b => b.IdBeneficiario).UseIdentityByDefaultColumn();
+           e.Property(b => b.Nome).HasColumnName("nome").HasMaxLength(150).IsRequired();
+           e.Property(b => b.Cpf).HasColumnName("cpf").HasMaxLength(11).IsRequired();
+           e.Property(b => b.DataNascimento).HasColumnName("data_nascimento").IsRequired();
+           e.Property(b => b.Endereco).HasColumnName("endereco").HasMaxLength(255).IsRequired();
+           e.Property(b => b.IdComunidade).HasColumnName("id_comunidade").IsRequired();
+           e.Property(b => b.TotalMembrosFamilia).HasColumnName("total_membros_familia").IsRequired();
+           e.Property(b => b.Ativo).HasColumnName("ativo").IsRequired();
+           e.Property(b => b.DataCriacao).HasColumnName("data_criacao").IsRequired();
+           e.HasIndex(b => b.Cpf).IsUnique();
+           e.HasOne(b => b.Comunidade).WithMany().HasForeignKey(b => b.IdComunidade); 
         });
     }
 }

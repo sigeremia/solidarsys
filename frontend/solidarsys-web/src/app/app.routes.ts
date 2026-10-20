@@ -35,11 +35,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/usuarios/usuarios-list/usuarios-list.component').then(m => m.UsuariosListComponent),
       },
       // Rotas futuras
-      { path: 'beneficiarios',  loadComponent: () => import('./features/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
+      { path: 'beneficiarios', loadComponent: () => import('./features/beneficiarios/beneficiarios-list/beneficiarios-list.component').then(m => m.BeneficiariosListComponent) },
       { path: 'doadores',       loadComponent: () => import('./features/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
       { path: 'visitas',        loadComponent: () => import('./features/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
       { path: 'comunidades',    loadComponent: () => import('./features/comunidades/comunidades-list/comunidades-list.component').then(m => m.ComunidadesListComponent) },
-      { path: 'setores',    loadComponent: () => import('./features/setores/setores-list/setores-list.component').then(m => m.SetoresListComponent) },
+      { path: 'setores',        loadComponent: () => import('./features/setores/setores-list/setores-list.component').then(m => m.SetoresListComponent) },
       { path: 'mapa',           loadComponent: () => import('./features/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
       { path: 'relatorios',     loadComponent: () => import('./features/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
     ],

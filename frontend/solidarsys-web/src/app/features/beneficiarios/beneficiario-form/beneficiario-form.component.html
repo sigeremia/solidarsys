@@ -1,0 +1,89 @@
+<p-dialog
+  [visible]="aberto"
+  [header]="modoEdicao ? 'Editar Beneficiário' : 'Novo Beneficiário'"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '520px' }"
+  (onHide)="fechar()">
+
+  @if (erro()) {
+    <p-message severity="error" [text]="erro()!" styleClass="w-full mb-4" />
+  }
+
+  <form [formGroup]="form" novalidate class="flex flex-col gap-4 pt-2" (ngSubmit)="salvar()">
+
+    <!-- Nome -->
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium text-slate-700">Nome</label>
+      <input pInputText formControlName="nome" class="w-full" />
+      @if (form.get('nome')?.touched && form.get('nome')?.invalid) {
+        <small class="text-red-500">Nome é obrigatório.</small>
+      }
+    </div>
+
+    <!-- CPF e Data de nascimento -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-slate-700">CPF</label>
+        <input
+          pInputText
+          formControlName="cpf"
+          inputmode="numeric"
+          maxlength="11"
+          placeholder="Somente números"
+          (input)="onCpfInput($event)"
+          class="w-full" />
+        @if (form.get('cpf')?.touched && form.get('cpf')?.invalid) {
+          <small class="text-red-500">
+            {{ form.get('cpf')?.hasError('required') ? 'CPF é obrigatório.' : 'CPF inválido.' }}
+          </small>
+        }
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-slate-700">Data de Nascimento</label>
+        <input pInputText type="date" formControlName="dataNascimento" [max]="hoje" class="w-full" />
+        @if (form.get('dataNascimento')?.touched && form.get('dataNascimento')?.invalid) {
+          <small class="text-red-500">Data de nascimento é obrigatória.</small>
+        }
+      </div>
+    </div>
+
+    <!-- Endereço -->
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium text-slate-700">Endereço</label>
+      <input pInputText formControlName="endereco" class="w-full" />
+      @if (form.get('endereco')?.touched && form.get('endereco')?.invalid) {
+        <small class="text-red-500">Endereço é obrigatório.</small>
+      }
+    </div>
+
+    <!-- Comunidade -->
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium text-slate-700">Comunidade</label>
+      <p-select
+        formControlName="idComunidade"
+        [options]="comunidades()"
+        optionLabel="nome"
+        optionValue="idComunidade"
+        placeholder="Selecione a comunidade"
+        [filter]="true"
+        filterBy="nome"
+        appendTo="body"
+        styleClass="w-full" />
+      @if (form.get('idComunidade')?.touched && form.get('idComunidade')?.invalid) {
+        <small class="text-red-500">Comunidade é obrigatória.</small>
+      }
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="w-full">
+      <p-button
+        [label]="modoEdicao ? 'Salvar alterações' : 'Cadastrar'"
+        styleClass="w-full"
+        (onClick)="salvar()"
+        [loading]="carregando()" />
+    </div>
+  </ng-template>
+</p-dialog>

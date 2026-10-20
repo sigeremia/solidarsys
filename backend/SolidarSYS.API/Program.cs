@@ -24,6 +24,8 @@ using SolidarSYS.Infrastructure.Email;
 using SolidarSYS.Infrastructure.Repositories;
 using SolidarSYS.Infrastructure.Setores;
 using SolidarSYS.API.Controllers;
+using SolidarSYS.Application.Beneficiarios.Interfaces;
+using SolidarSYS.Application.Beneficiarios.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,6 +63,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IComunidadeService, ComunidadeService>();
 builder.Services.AddScoped<ISetoresService, SetoresService>();
+builder.Services.AddScoped<IBeneficiarioRepository, BeneficiarioRepository>();
+builder.Services.AddScoped<IBeneficiarioService, BeneficiarioService>();
 
 // ───── JWT Authentication ─────
 var jwtKey = builder.Configuration["Jwt:SecretKey"]!;
