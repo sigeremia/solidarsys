@@ -122,12 +122,12 @@ builder.Services.AddCors(opt =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowRenderFrontend", policy =>
-    {
-        policy.WithOrigins("https://solidarsys-1.onrender.com") 
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials(); // Fundamental se a rota /auth/refresh utilizar cookies
-    });
+{
+    policy.WithOrigins("https://solidarsys-1.onrender.com") // TEM DE ADICIONAR ESTA LINHA
+          .AllowAnyHeader()
+          .AllowAnyMethod()
+          .AllowCredentials(); // Fundamental se a rota /auth/refresh utilizar cookies
+});
 });
 
 // ───── OpenAPI (Scalar) ─────
@@ -156,11 +156,10 @@ if (app.Environment.IsDevelopment())
     });
 }
 app.UseCors("AllowRenderFrontend");
-app.UseCors("SolidarSYS");
 app.UseHttpsRedirection();
 app.UseRateLimiter();
 app.UseAuthentication();
-app.MapControllers();
 app.UseAuthorization();
+app.MapControllers();
 
 app.Run();
