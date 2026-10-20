@@ -66,6 +66,7 @@ builder.Services.AddScoped<ISetoresService, SetoresService>();
 builder.Services.AddScoped<IBeneficiarioRepository, BeneficiarioRepository>();
 builder.Services.AddScoped<IBeneficiarioService, BeneficiarioService>();
 
+
 // ───── JWT Authentication ─────
 var jwtKey = builder.Configuration["Jwt:SecretKey"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -118,6 +119,17 @@ builder.Services.AddCors(opt =>
               .AllowAnyMethod()
               .AllowCredentials()));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowRenderFrontend", policy =>
+    {
+        policy.WithOrigins("https://solidarsys-1.onrender.com") 
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Fundamental se a rota /auth/refresh utilizar cookies
+    });
+});
+
 // ───── OpenAPI (Scalar) ─────
 builder.Services.AddOpenApi();
 
@@ -143,12 +155,12 @@ if (app.Environment.IsDevelopment())
         opt.DefaultHttpClient = new(ScalarTarget.Http, ScalarClient.Http11);
     });
 }
-
+app.UseCors("AllowRenderFrontend");
 app.UseCors("SolidarSYS");
 app.UseHttpsRedirection();
 app.UseRateLimiter();
 app.UseAuthentication();
-app.UseAuthorization();
 app.MapControllers();
+app.UseAuthorization();
 
 app.Run();
