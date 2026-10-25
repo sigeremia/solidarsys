@@ -14,6 +14,8 @@ public class SolidarSysDbContext(DbContextOptions<SolidarSysDbContext> options) 
     public DbSet<TokenRecuperacaoSenha> TokensRecuperacaoSenha => Set<TokenRecuperacaoSenha>();
     public DbSet<Comunidade> Comunidades => Set<Comunidade>();
     public DbSet<Beneficiario> Beneficiarios => Set<Beneficiario>();
+    public DbSet<Doador> Doadores => Set<Doador>();
+    public DbSet<Doacao> Doacoes => Set<Doacao>();
 
     private bool IsPostgres => Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL";
 
@@ -143,6 +145,40 @@ public class SolidarSysDbContext(DbContextOptions<SolidarSysDbContext> options) 
            e.Property(b => b.DataCriacao).HasColumnName("data_criacao").IsRequired();
            e.HasIndex(b => b.Cpf).IsUnique();
            e.HasOne(b => b.Comunidade).WithMany().HasForeignKey(b => b.IdComunidade); 
+        });
+
+        modelBuilder.Entity<Doador>(e =>
+        {
+            e.ToTable("doadores");
+            e.HasKey(d => d.IdDoador);
+            e.Property(d => d.IdDoador).HasColumnName("id_doador");
+            if (IsPostgres) e.Property(d => d.IdDoador).UseIdentityByDefaultColumn();
+            e.Property(d => d.Tipo).HasColumnName("tipo").HasConversion<string>().HasMaxLength(20).IsRequired();
+            e.Property(d => d.Nome).HasColumnName("nome").HasMaxLength(100).IsRequired();
+            e.Property(d => d.NomeFantasia).HasColumnName("nome_fantasia").HasMaxLength(100);
+            e.Property(d => d.Documento).HasColumnName("documento").HasMaxLength(18).IsRequired();
+            e.Property(d => d.Telefone).HasColumnName("telefone").HasMaxLength(15);
+            e.Property(d => d.Email).HasColumnName("email").HasMaxLength(150);
+            e.Property(d => d.DataCadastro).HasColumnName("data_cadastro").IsRequired();
+            e.Property(d => d.Observacao).HasColumnName("observacao");
+            e.Property(d => d.Ativo).HasColumnName("ativo").IsRequired();
+            e.HasIndex(d => d.Documento).IsUnique();
+        });
+
+        modelBuilder.Entity<Doacao>(e =>
+        {
+            e.ToTable("doacoes");
+            e.HasKey(d => d.Id);
+            e.Property(d => d.Id).HasColumnName("id");
+            if (IsPostgres) e.Property(d => d.Id).UseIdentityByDefaultColumn();
+            e.Property(d => d.IdDoador).HasColumnName("id_doador").IsRequired();
+            e.Property(d => d.Data).HasColumnName("data").IsRequired();
+            e.Property(d => d.Valor).HasColumnName("valor").HasPrecision(12, 2).IsRequired();
+            e.Property(d => d.Descricao).HasColumnName("descricao").HasMaxLength(255).IsRequired();
+            e.Property(d => d.Tipo).HasColumnName("tipo").HasConversion<string>().HasMaxLength(20).IsRequired();
+            e.Property(d => d.DataCadastro).HasColumnName("data_cadastro").IsRequired();
+            e.HasIndex(d => new { d.IdDoador, d.Data });
+            e.HasOne(d => d.Doador).WithMany(doador => doador.Doacoes).HasForeignKey(d => d.IdDoador);
         });
     }
 }

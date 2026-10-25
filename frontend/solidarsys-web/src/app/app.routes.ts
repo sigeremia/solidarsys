@@ -36,7 +36,7 @@ export const routes: Routes = [
       },
       // Rotas futuras
       { path: 'beneficiarios', loadComponent: () => import('./features/beneficiarios/beneficiarios-list/beneficiarios-list.component').then(m => m.BeneficiariosListComponent) },
-      { path: 'doadores',       loadComponent: () => import('./features/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
+      { path: 'doadores',       loadComponent: () => import('./features/doadores/doadores-list/doadores-list.component').then(m => m.DoadoresListComponent) },
       { path: 'visitas',        loadComponent: () => import('./features/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
       { path: 'comunidades',    loadComponent: () => import('./features/comunidades/comunidades-list/comunidades-list.component').then(m => m.ComunidadesListComponent) },
       { path: 'setores',        loadComponent: () => import('./features/setores/setores-list/setores-list.component').then(m => m.SetoresListComponent) },

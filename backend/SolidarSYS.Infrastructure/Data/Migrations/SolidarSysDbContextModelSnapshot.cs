@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using SolidarSYS.Domain.Enums;
 using SolidarSYS.Infrastructure.Data;
 
 #nullable disable
@@ -22,6 +23,63 @@ namespace SolidarSYS.Infrastructure.Data.Migrations
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "nivel_acesso", new[] { "administrador", "gestor", "operador", "voluntario" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("SolidarSYS.Domain.Entities.Beneficiario", b =>
+                {
+                    b.Property<int>("IdBeneficiario")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id_beneficiario");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdBeneficiario"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("boolean")
+                        .HasColumnName("ativo");
+
+                    b.Property<string>("Cpf")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("character varying(11)")
+                        .HasColumnName("cpf");
+
+                    b.Property<DateTime>("DataCriacao")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("data_criacao");
+
+                    b.Property<DateOnly>("DataNascimento")
+                        .HasColumnType("date")
+                        .HasColumnName("data_nascimento");
+
+                    b.Property<string>("Endereco")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("endereco");
+
+                    b.Property<int>("IdComunidade")
+                        .HasColumnType("integer")
+                        .HasColumnName("id_comunidade");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("nome");
+
+                    b.Property<int>("TotalMembrosFamilia")
+                        .HasColumnType("integer")
+                        .HasColumnName("total_membros_familia");
+
+                    b.HasKey("IdBeneficiario");
+
+                    b.HasIndex("Cpf")
+                        .IsUnique();
+
+                    b.HasIndex("IdComunidade");
+
+                    b.ToTable("beneficiarios", (string)null);
+                });
 
             modelBuilder.Entity("SolidarSYS.Domain.Entities.Comunidade", b =>
                 {
@@ -64,6 +122,113 @@ namespace SolidarSYS.Infrastructure.Data.Migrations
                     b.HasKey("IdComunidade");
 
                     b.ToTable("comunidades", (string)null);
+                });
+
+            modelBuilder.Entity("SolidarSYS.Domain.Entities.Doacao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("Data")
+                        .HasColumnType("date")
+                        .HasColumnName("data");
+
+                    b.Property<DateTimeOffset>("DataCadastro")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("data_cadastro");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("descricao");
+
+                    b.Property<int>("IdDoador")
+                        .HasColumnType("integer")
+                        .HasColumnName("id_doador");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("tipo");
+
+                    b.Property<decimal>("Valor")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("valor");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdDoador", "Data");
+
+                    b.ToTable("doacoes", (string)null);
+                });
+
+            modelBuilder.Entity("SolidarSYS.Domain.Entities.Doador", b =>
+                {
+                    b.Property<int>("IdDoador")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id_doador");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdDoador"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("boolean")
+                        .HasColumnName("ativo");
+
+                    b.Property<DateOnly>("DataCadastro")
+                        .HasColumnType("date")
+                        .HasColumnName("data_cadastro");
+
+                    b.Property<string>("Documento")
+                        .IsRequired()
+                        .HasMaxLength(18)
+                        .HasColumnType("character varying(18)")
+                        .HasColumnName("documento");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("email");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("nome");
+
+                    b.Property<string>("NomeFantasia")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("nome_fantasia");
+
+                    b.Property<string>("Observacao")
+                        .HasColumnType("text")
+                        .HasColumnName("observacao");
+
+                    b.Property<string>("Telefone")
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)")
+                        .HasColumnName("telefone");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("tipo");
+
+                    b.HasKey("IdDoador");
+
+                    b.HasIndex("Documento")
+                        .IsUnique();
+
+                    b.ToTable("doadores", (string)null);
                 });
 
             modelBuilder.Entity("SolidarSYS.Domain.Entities.Permissao", b =>
@@ -278,7 +443,7 @@ namespace SolidarSYS.Infrastructure.Data.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("id_setor");
 
-                    b.Property<int>("NivelAcesso")
+                    b.Property<NivelAcesso>("NivelAcesso")
                         .HasColumnType("nivel_acesso")
                         .HasColumnName("nivel_acesso");
 
@@ -309,6 +474,28 @@ namespace SolidarSYS.Infrastructure.Data.Migrations
                     b.HasIndex("IdSetor");
 
                     b.ToTable("usuarios", (string)null);
+                });
+
+            modelBuilder.Entity("SolidarSYS.Domain.Entities.Beneficiario", b =>
+                {
+                    b.HasOne("SolidarSYS.Domain.Entities.Comunidade", "Comunidade")
+                        .WithMany()
+                        .HasForeignKey("IdComunidade")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Comunidade");
+                });
+
+            modelBuilder.Entity("SolidarSYS.Domain.Entities.Doacao", b =>
+                {
+                    b.HasOne("SolidarSYS.Domain.Entities.Doador", "Doador")
+                        .WithMany("Doacoes")
+                        .HasForeignKey("IdDoador")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doador");
                 });
 
             modelBuilder.Entity("SolidarSYS.Domain.Entities.RefreshToken", b =>
@@ -359,6 +546,11 @@ namespace SolidarSYS.Infrastructure.Data.Migrations
                         .HasForeignKey("IdSetor");
 
                     b.Navigation("Setor");
+                });
+
+            modelBuilder.Entity("SolidarSYS.Domain.Entities.Doador", b =>
+                {
+                    b.Navigation("Doacoes");
                 });
 
             modelBuilder.Entity("SolidarSYS.Domain.Entities.Permissao", b =>

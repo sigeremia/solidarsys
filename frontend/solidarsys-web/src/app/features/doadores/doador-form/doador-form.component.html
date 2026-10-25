@@ -1,0 +1,98 @@
+<p-dialog
+  [visible]="aberto"
+  [header]="modoEdicao ? 'Editar Doador' : 'Novo Doador'"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '520px' }"
+  (onHide)="fechar()">
+
+  @if (erro()) {
+    <p-message severity="error" [text]="erro()!" styleClass="w-full mb-4" />
+  }
+
+  <form [formGroup]="form" novalidate class="flex flex-col gap-4 pt-2" (ngSubmit)="salvar()">
+    <div class="flex flex-col gap-1">
+      <label id="tipo-doador-label" class="text-sm font-medium text-slate-700">Tipo de Doador *</label>
+      <p-selectbutton
+        [options]="tiposDoador"
+        optionLabel="label"
+        optionValue="value"
+        formControlName="tipo"
+        [allowEmpty]="false"
+        ariaLabelledBy="tipo-doador-label"
+        (onChange)="onTipoAlterado()"
+        styleClass="w-full" />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="nome-doador" class="text-sm font-medium text-slate-700">{{ tipo === 'PESSOA_FISICA' ? 'Nome' : 'Razão Social' }} *</label>
+      <input pInputText id="nome-doador" formControlName="nome" class="w-full" />
+      @if (form.get('nome')?.touched && form.get('nome')?.invalid) {
+        <small class="text-red-500">Informe o nome (máximo de 100 caracteres).</small>
+      }
+    </div>
+
+    @if (tipo === 'PESSOA_JURIDICA') {
+      <div class="flex flex-col gap-1">
+        <label for="nome-fantasia" class="text-sm font-medium text-slate-700">Nome Fantasia</label>
+        <input pInputText id="nome-fantasia" formControlName="nomeFantasia" class="w-full" />
+      </div>
+    }
+
+    <div class="flex flex-col gap-1">
+      <label for="documento-doador" class="text-sm font-medium text-slate-700">
+        {{ tipo === 'PESSOA_FISICA' ? 'CPF / Documento Estrangeiro' : 'CNPJ / Documento Estrangeiro' }} *
+      </label>
+      <input
+        pInputText
+        id="documento-doador"
+        formControlName="documento"
+        maxlength="18"
+        [placeholder]="tipo === 'PESSOA_FISICA' ? '000.000.000-00' : '00.000.000/0000-00'"
+        class="w-full" />
+      @if (form.get('documento')?.touched && form.get('documento')?.invalid) {
+        <small class="text-red-500">
+          {{ form.get('documento')?.hasError('required') ? 'Documento é obrigatório.' : 'Documento inválido.' }}
+        </small>
+      }
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="telefone-doador" class="text-sm font-medium text-slate-700">Contato</label>
+      <input
+        pInputText
+        id="telefone-doador"
+        formControlName="telefone"
+        inputmode="tel"
+        maxlength="15"
+        placeholder="(00) 00000-0000"
+        (input)="onTelefoneInput($event)"
+        class="w-full" />
+      @if (form.get('telefone')?.touched && form.get('telefone')?.invalid) {
+        <small class="text-red-500">Informe um telefone com DDD.</small>
+      }
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="email-doador" class="text-sm font-medium text-slate-700">Email</label>
+      <input pInputText id="email-doador" type="email" formControlName="email" class="w-full" />
+      @if (form.get('email')?.touched && form.get('email')?.invalid) {
+        <small class="text-red-500">Informe um email válido (máximo de 150 caracteres).</small>
+      }
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="observacao-doador" class="text-sm font-medium text-slate-700">Observação</label>
+      <textarea pTextarea id="observacao-doador" formControlName="observacao" rows="3" class="w-full"></textarea>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2">
+      <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="fechar()" />
+      <p-button
+        [label]="modoEdicao ? 'Salvar alterações' : 'Cadastrar Doador'"
+        type="submit"
+        [disabled]="form.invalid || carregando()"
+        [loading]="carregando()" />
+    </div>
+  </form>
+</p-dialog>

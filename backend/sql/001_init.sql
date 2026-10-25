@@ -61,11 +61,36 @@ CREATE TABLE IF NOT EXISTS tokens_recuperacao_senha (
     criado_em   TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS doadores (
+    id_doador     SERIAL PRIMARY KEY,
+    tipo          VARCHAR(20) NOT NULL,
+    nome          VARCHAR(100) NOT NULL,
+    nome_fantasia VARCHAR(100),
+    documento     VARCHAR(18) NOT NULL,
+    telefone      VARCHAR(15),
+    email         VARCHAR(150),
+    data_cadastro DATE NOT NULL DEFAULT CURRENT_DATE,
+    observacao    TEXT,
+    ativo         BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT uq_doadores_documento UNIQUE (documento)
+);
+
+CREATE TABLE IF NOT EXISTS doacoes (
+    id            SERIAL PRIMARY KEY,
+    id_doador     INT NOT NULL REFERENCES doadores(id_doador),
+    data          DATE NOT NULL,
+    valor         NUMERIC(12, 2) NOT NULL,
+    descricao     VARCHAR(255) NOT NULL,
+    tipo          VARCHAR(20) NOT NULL,
+    data_cadastro TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- Índices
 CREATE INDEX IF NOT EXISTS idx_usuarios_email      ON usuarios(email);
 CREATE INDEX IF NOT EXISTS idx_usuarios_cpf        ON usuarios(cpf);
 CREATE INDEX IF NOT EXISTS idx_refresh_tokens_uid  ON refresh_tokens(id_usuario);
 CREATE INDEX IF NOT EXISTS idx_tokens_rec_uid      ON tokens_recuperacao_senha(id_usuario);
+CREATE INDEX IF NOT EXISTS idx_doacoes_doador_data ON doacoes(id_doador, data);
 
 -- Setor inicial e usuário ADMINISTRADOR padrão
 -- IMPORTANTE: altere a senha abaixo antes de usar em produção.

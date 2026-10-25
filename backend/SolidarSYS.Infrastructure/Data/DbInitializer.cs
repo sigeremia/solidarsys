@@ -23,6 +23,7 @@ public static class DbInitializer
         // SQLite pode deixar um arquivo já existente sem todas as tabelas em dev local.stentes.
         await EnsureCommunityTableExistsAsync(db);
         await EnsureBeneficiariosTableExistsAsync(db);
+        await EnsureDoadoresTablesExistAsync(db);
 
         await SeedAsync(db);
     }
@@ -77,6 +78,38 @@ public static class DbInitializer
         );
         CREATE UNIQUE INDEX IF NOT EXISTS ix_beneficiarios_cpf ON beneficiarios(cpf);");
 }
+
+    private static async Task EnsureDoadoresTablesExistAsync(SolidarSysDbContext db)
+    {
+        if (db.Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            return;
+
+        await db.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE IF NOT EXISTS doadores (
+                id_doador INTEGER PRIMARY KEY AUTOINCREMENT,
+                tipo TEXT NOT NULL,
+                nome TEXT NOT NULL,
+                nome_fantasia TEXT,
+                documento TEXT NOT NULL,
+                telefone TEXT,
+                email TEXT,
+                data_cadastro TEXT NOT NULL,
+                observacao TEXT,
+                ativo INTEGER NOT NULL
+            );
+            CREATE UNIQUE INDEX IF NOT EXISTS IX_doadores_documento ON doadores(documento);
+            CREATE TABLE IF NOT EXISTS doacoes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id_doador INTEGER NOT NULL,
+                data TEXT NOT NULL,
+                valor NUMERIC NOT NULL,
+                descricao TEXT NOT NULL,
+                tipo TEXT NOT NULL,
+                data_cadastro TEXT NOT NULL,
+                FOREIGN KEY (id_doador) REFERENCES doadores(id_doador)
+            );
+            CREATE INDEX IF NOT EXISTS IX_doacoes_id_doador_data ON doacoes(id_doador, data);");
+    }
 
     private static async Task SeedAsync(SolidarSysDbContext db)
     {
@@ -310,6 +343,86 @@ public static class DbInitializer
 
             await db.SaveChangesAsync();
             await EnsureBeneficiariosTableExistsAsync(db);
+        }
+
+        if (!await db.Doadores.AnyAsync())
+        {
+            var doadores = new[]
+            {
+                new Doador
+                {
+                    Tipo = TipoDoador.PESSOA_FISICA,
+                    Nome = "Roberto Almeida (Demo)",
+                    Documento = "52998224725",
+                    Telefone = "11999991111",
+                    Email = "roberto.demo@example.org",
+                    DataCadastro = new DateOnly(2026, 1, 10),
+                    Ativo = true,
+                },
+                new Doador
+                {
+                    Tipo = TipoDoador.PESSOA_JURIDICA,
+                    Nome = "Tech Solutions LTDA (Demo)",
+                    NomeFantasia = "Tech Solutions",
+                    Documento = "11222333000181",
+                    Telefone = "1133334444",
+                    Email = "contato.demo@example.org",
+                    DataCadastro = new DateOnly(2026, 1, 5),
+                    Ativo = true,
+                },
+                new Doador
+                {
+                    Tipo = TipoDoador.PESSOA_FISICA,
+                    Nome = "Fernanda Costa (Demo)",
+                    Documento = "11144477735",
+                    Telefone = "11988882222",
+                    DataCadastro = new DateOnly(2026, 2, 1),
+                    Ativo = true,
+                },
+                new Doador
+                {
+                    Tipo = TipoDoador.PESSOA_JURIDICA,
+                    Nome = "Construtora Horizonte (Demo)",
+                    NomeFantasia = "Horizonte",
+                    Documento = "EXT-EMPRESA-0004",
+                    Telefone = "1122225555",
+                    DataCadastro = new DateOnly(2026, 2, 10),
+                    Ativo = true,
+                },
+            };
+
+            db.Doadores.AddRange(doadores);
+            await db.SaveChangesAsync();
+
+            db.Doacoes.AddRange(
+                new Doacao
+                {
+                    IdDoador = doadores[0].IdDoador,
+                    Data = new DateOnly(2026, 3, 12),
+                    Valor = 100,
+                    Descricao = "Doação demonstrativa de apoio financeiro",
+                    Tipo = TipoDoacao.DINHEIRO,
+                    DataCadastro = new DateTimeOffset(2026, 3, 12, 12, 0, 0, TimeSpan.Zero),
+                },
+                new Doacao
+                {
+                    IdDoador = doadores[1].IdDoador,
+                    Data = new DateOnly(2026, 1, 3),
+                    Valor = 250,
+                    Descricao = "Doação demonstrativa de alimentos",
+                    Tipo = TipoDoacao.ALIMENTOS,
+                    DataCadastro = new DateTimeOffset(2026, 1, 3, 12, 0, 0, TimeSpan.Zero),
+                },
+                new Doacao
+                {
+                    IdDoador = doadores[2].IdDoador,
+                    Data = new DateOnly(2026, 2, 25),
+                    Valor = 150,
+                    Descricao = "Doação demonstrativa de materiais escolares",
+                    Tipo = TipoDoacao.OUTROS,
+                    DataCadastro = new DateTimeOffset(2026, 2, 25, 12, 0, 0, TimeSpan.Zero),
+                });
+            await db.SaveChangesAsync();
         }
     }
 }

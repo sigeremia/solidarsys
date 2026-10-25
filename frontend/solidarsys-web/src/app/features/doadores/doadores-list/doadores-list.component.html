@@ -1,0 +1,99 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="p-6">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800">Doadores</h1>
+      <p class="text-slate-500 text-sm mt-0.5">Pessoa Física e Jurídica</p>
+    </div>
+    @if (podeEditar) {
+      <p-button label="Novo Doador" icon="pi pi-plus" (onClick)="abrirNovo()" />
+    }
+  </div>
+
+  <div class="mb-4">
+    <p-iconfield class="w-full max-w-sm" iconPosition="left">
+      <p-inputicon class="pi pi-search" />
+      <input
+        pInputText
+        type="text"
+        [(ngModel)]="busca"
+        (ngModelChange)="onBusca()"
+        placeholder="Buscar por nome ou documento..."
+        class="w-full" />
+    </p-iconfield>
+  </div>
+
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <p-table
+      [value]="doadores()"
+      [loading]="carregando()"
+      [lazy]="true"
+      [totalRecords]="total()"
+      [rows]="tamanhoPagina"
+      [paginator]="true"
+      [alwaysShowPaginator]="false"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      (onPage)="onPage($event)"
+      styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Tipo</th>
+          <th>Nome / Razão Social</th>
+          <th>CPF / CNPJ</th>
+          <th>Contato</th>
+          <th>Última Doação</th>
+          <th class="w-28">Ações</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-doador>
+        <tr>
+          <td>
+            <p-tag
+              [value]="doador.tipo === 'PESSOA_FISICA' ? 'Pessoa Física' : 'Pessoa Jurídica'"
+              [severity]="doador.tipo === 'PESSOA_FISICA' ? 'success' : 'secondary'"
+              [rounded]="true" />
+          </td>
+          <td class="font-medium text-slate-800">{{ doador.nome }}</td>
+          <td class="text-slate-600 text-sm">{{ formatarDocumento(doador.documento) }}</td>
+          <td class="text-slate-600 text-sm">{{ formatarTelefone(doador.telefone) }}</td>
+          <td class="text-slate-600 text-sm">{{ formatarData(doador.ultimaDoacao) }}</td>
+          <td>
+            <div class="flex gap-1">
+              @if (podeEditar) {
+                <p-button
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="secondary"
+                  pTooltip="Editar"
+                  (onClick)="abrirEdicao(doador)" />
+                <p-button
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="danger"
+                  pTooltip="Remover"
+                  (onClick)="confirmarRemocao(doador)" />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center text-slate-400 py-8">Nenhum doador encontrado.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<app-doador-form
+  [aberto]="formAberto()"
+  [doador]="doadorEmEdicao()"
+  (fechou)="formAberto.set(false)"
+  (salvo)="onFormSalvo()" />

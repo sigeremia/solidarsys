@@ -26,6 +26,8 @@ using SolidarSYS.Infrastructure.Setores;
 using SolidarSYS.API.Controllers;
 using SolidarSYS.Application.Beneficiarios.Interfaces;
 using SolidarSYS.Application.Beneficiarios.Services;
+using SolidarSYS.Application.Doadores.Interfaces;
+using SolidarSYS.Application.Doadores.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +67,8 @@ builder.Services.AddScoped<IComunidadeService, ComunidadeService>();
 builder.Services.AddScoped<ISetoresService, SetoresService>();
 builder.Services.AddScoped<IBeneficiarioRepository, BeneficiarioRepository>();
 builder.Services.AddScoped<IBeneficiarioService, BeneficiarioService>();
+builder.Services.AddScoped<IDoadorRepository, DoadorRepository>();
+builder.Services.AddScoped<IDoadorService, DoadorService>();
 
 
 // ───── JWT Authentication ─────
@@ -112,23 +116,20 @@ builder.Services.AddRateLimiter(options =>
 });
 
 // ───── CORS ─────
-builder.Services.AddCors(opt =>
-    opt.AddPolicy("SolidarSYS", policy =>
-        policy.WithOrigins(builder.Configuration["App:FrontendUrl"] ?? "http://localhost:4200")
+var frontendOrigins = new[]
+{
+    builder.Configuration["App:FrontendUrl"] ?? "http://localhost:4200",
+    "http://localhost:4200",
+    "http://127.0.0.1:4200",
+    "https://solidarsys-1.onrender.com",
+};
+
+builder.Services.AddCors(options =>
+    options.AddPolicy("SolidarSYS", policy =>
+        policy.WithOrigins(frontendOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials()));
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowRenderFrontend", policy =>
-{
-    policy.WithOrigins("https://solidarsys-1.onrender.com") // TEM DE ADICIONAR ESTA LINHA
-          .AllowAnyHeader()
-          .AllowAnyMethod()
-          .AllowCredentials(); // Fundamental se a rota /auth/refresh utilizar cookies
-});
-});
 
 // ───── OpenAPI (Scalar) ─────
 builder.Services.AddOpenApi();
@@ -155,7 +156,7 @@ if (app.Environment.IsDevelopment())
         opt.DefaultHttpClient = new(ScalarTarget.Http, ScalarClient.Http11);
     });
 }
-app.UseCors("AllowRenderFrontend");
+app.UseCors("SolidarSYS");
 app.UseHttpsRedirection();
 app.UseRateLimiter();
 app.UseAuthentication();
