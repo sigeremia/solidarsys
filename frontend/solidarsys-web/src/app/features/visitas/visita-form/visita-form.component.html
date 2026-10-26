@@ -1,0 +1,68 @@
+<p-dialog
+  [visible]="aberto"
+  [header]="modoEdicao ? 'Editar Visita' : 'Nova Visita'"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '520px' }"
+  (onHide)="fechar()">
+
+  @if (erro()) {
+    <p-message severity="error" [text]="erro()!" styleClass="w-full mb-4" />
+  }
+
+  <form [formGroup]="form" novalidate class="flex flex-col gap-4 pt-2" (ngSubmit)="salvar()">
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium text-slate-700">Beneficiário</label>
+      <p-select
+        formControlName="idBeneficiario"
+        [options]="beneficiarios()"
+        optionLabel="nome"
+        optionValue="idBeneficiario"
+        placeholder="Selecione o beneficiário"
+        [filter]="true"
+        filterBy="nome"
+        appendTo="body"
+        styleClass="w-full" />
+      @if (form.get('idBeneficiario')?.touched && form.get('idBeneficiario')?.invalid) {
+        <small class="text-red-500">Beneficiário é obrigatório.</small>
+      }
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-slate-700">Data</label>
+        <input pInputText type="date" formControlName="dataVisita" class="w-full" />
+        @if (form.get('dataVisita')?.touched && form.get('dataVisita')?.invalid) {
+          <small class="text-red-500">Data é obrigatória.</small>
+        }
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-slate-700">Responsável</label>
+        <input pInputText formControlName="responsavel" class="w-full" />
+        @if (form.get('responsavel')?.touched && form.get('responsavel')?.invalid) {
+          <small class="text-red-500">Responsável é obrigatório.</small>
+        }
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium text-slate-700">Observações</label>
+      <textarea
+        pInputTextarea
+        formControlName="observacoes"
+        rows="4"
+        class="w-full"
+        placeholder="Descreva a visita, atendimento ou acompanhamento."></textarea>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="w-full">
+      <p-button
+        [label]="modoEdicao ? 'Salvar alterações' : 'Registrar'"
+        styleClass="w-full"
+        (onClick)="salvar()"
+        [loading]="carregando()" />
+    </div>
+  </ng-template>
+</p-dialog>

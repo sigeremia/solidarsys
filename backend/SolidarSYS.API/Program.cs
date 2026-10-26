@@ -28,6 +28,8 @@ using SolidarSYS.Application.Beneficiarios.Interfaces;
 using SolidarSYS.Application.Beneficiarios.Services;
 using SolidarSYS.Application.Doadores.Interfaces;
 using SolidarSYS.Application.Doadores.Services;
+using SolidarSYS.Application.Visitas.Interfaces;
+using SolidarSYS.Application.Visitas.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,6 +69,8 @@ builder.Services.AddScoped<IComunidadeService, ComunidadeService>();
 builder.Services.AddScoped<ISetoresService, SetoresService>();
 builder.Services.AddScoped<IBeneficiarioRepository, BeneficiarioRepository>();
 builder.Services.AddScoped<IBeneficiarioService, BeneficiarioService>();
+builder.Services.AddScoped<IVisitaRepository, VisitaRepository>();
+builder.Services.AddScoped<IVisitaService, VisitaService>();
 builder.Services.AddScoped<IDoadorRepository, DoadorRepository>();
 builder.Services.AddScoped<IDoadorService, DoadorService>();
 

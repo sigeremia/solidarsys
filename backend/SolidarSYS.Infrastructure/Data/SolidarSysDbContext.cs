@@ -14,6 +14,7 @@ public class SolidarSysDbContext(DbContextOptions<SolidarSysDbContext> options) 
     public DbSet<TokenRecuperacaoSenha> TokensRecuperacaoSenha => Set<TokenRecuperacaoSenha>();
     public DbSet<Comunidade> Comunidades => Set<Comunidade>();
     public DbSet<Beneficiario> Beneficiarios => Set<Beneficiario>();
+    public DbSet<Visita> Visitas => Set<Visita>();
     public DbSet<Doador> Doadores => Set<Doador>();
     public DbSet<Doacao> Doacoes => Set<Doacao>();
 
@@ -145,6 +146,21 @@ public class SolidarSysDbContext(DbContextOptions<SolidarSysDbContext> options) 
            e.Property(b => b.DataCriacao).HasColumnName("data_criacao").IsRequired();
            e.HasIndex(b => b.Cpf).IsUnique();
            e.HasOne(b => b.Comunidade).WithMany().HasForeignKey(b => b.IdComunidade); 
+        });
+
+        modelBuilder.Entity<Visita>(e =>
+        {
+            e.ToTable("visitas");
+            e.HasKey(v => v.IdVisita);
+            e.Property(v => v.IdVisita).HasColumnName("id_visita");
+            if (IsPostgres) e.Property(v => v.IdVisita).UseIdentityByDefaultColumn();
+            e.Property(v => v.IdBeneficiario).HasColumnName("id_beneficiario").IsRequired();
+            e.Property(v => v.DataVisita).HasColumnName("data_visita").IsRequired();
+            e.Property(v => v.Responsavel).HasColumnName("responsavel").HasMaxLength(100).IsRequired();
+            e.Property(v => v.Observacoes).HasColumnName("observacoes");
+            e.Property(v => v.DataCadastro).HasColumnName("data_cadastro").IsRequired();
+            e.HasIndex(v => new { v.IdBeneficiario, v.DataVisita }).IsUnique();
+            e.HasOne(v => v.Beneficiario).WithMany().HasForeignKey(v => v.IdBeneficiario);
         });
 
         modelBuilder.Entity<Doador>(e =>

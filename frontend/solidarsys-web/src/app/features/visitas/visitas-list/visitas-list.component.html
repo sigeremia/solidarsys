@@ -1,0 +1,95 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="p-6">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800">Visitas</h1>
+      <p class="text-slate-500 text-sm mt-0.5">Registro de visitas aos beneficiários</p>
+    </div>
+    @if (podeEditar) {
+      <p-button label="Nova Visita" icon="pi pi-plus" (onClick)="abrirNovo()" />
+    }
+  </div>
+
+  <div class="mb-4">
+    <p-iconfield class="w-full max-w-sm" iconPosition="left">
+      <p-inputicon class="pi pi-search" />
+      <input
+        pInputText
+        type="text"
+        [(ngModel)]="busca"
+        (ngModelChange)="onBusca()"
+        placeholder="Buscar por beneficiário ou responsável..."
+        class="w-full" />
+    </p-iconfield>
+  </div>
+
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <p-table
+      [value]="visitas()"
+      [loading]="carregando()"
+      [lazy]="true"
+      [totalRecords]="total()"
+      [rows]="tamanhoPagina"
+      [paginator]="true"
+      [alwaysShowPaginator]="false"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      (onPage)="onPage($event)"
+      styleClass="p-datatable-sm">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Beneficiário</th>
+          <th>Data</th>
+          <th>Responsável</th>
+          <th>Observações</th>
+          <th class="w-28">Ações</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-visita>
+        <tr>
+          <td class="font-medium text-slate-800">{{ visita.beneficiario }}</td>
+          <td class="text-slate-600 text-sm">{{ formatarData(visita.dataVisita) }}</td>
+          <td class="text-slate-600 text-sm">{{ visita.responsavel }}</td>
+          <td class="text-slate-600 text-sm max-w-xs truncate">{{ visita.observacoes || '—' }}</td>
+          <td>
+            <div class="flex gap-1">
+              @if (podeEditar) {
+                <p-button
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="secondary"
+                  pTooltip="Editar"
+                  (onClick)="abrirEdicao(visita)" />
+              }
+              @if (podeRemover) {
+                <p-button
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="danger"
+                  pTooltip="Excluir"
+                  (onClick)="confirmarRemocao(visita)" />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="text-center text-slate-400 py-8">Nenhuma visita encontrada.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<app-visita-form
+  [aberto]="formAberto()"
+  [visita]="visitaEmEdicao()"
+  (fechou)="formAberto.set(false)"
+  (salvo)="onFormSalvo()" />

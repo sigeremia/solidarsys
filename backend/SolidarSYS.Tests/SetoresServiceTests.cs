@@ -14,17 +14,17 @@ public class SetoresServiceTests
     public async Task ListarAsync_ShouldReturnMappedPagedResult()
     {
         var repo = new Mock<ISetoresRepository>();
-        var setores = new Setores
+        var setor = new Setor
         {
-            IdSetores = 1,
-            Nome = "Setores A",
+            Id = 1,
+            Nome = "Setor A",
             Descricao = "Descricao A",
             Ativo = true,
             DataCriacao = DateTime.UtcNow
         };
 
         repo.Setup(r => r.ListarAsync(1, 10, "A", true, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((new List<Setores> { setores }, 1));
+            .ReturnsAsync((new List<Setor> { setor }, 1));
 
         var service = new SetoresService(repo.Object);
 
@@ -34,40 +34,40 @@ public class SetoresServiceTests
         result.Pagina.Should().Be(1);
         result.Items.Should().HaveCount(1);
         result.Items[0].IdSetores.Should().Be(1);
-        result.Items[0].Nome.Should().Be("Setores A");
+        result.Items[0].Nome.Should().Be("Setor A");
     }
 
     [Fact]
-    public async Task ObterPorIdAsync_ShouldThrow_WhenSetoresDoesNotExist()
+    public async Task ObterPorIdAsync_ShouldThrow_WhenSetorDoesNotExist()
     {
         var repo = new Mock<ISetoresRepository>();
         repo.Setup(r => r.ObterPorIdAsync(99, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Comunidade?)null);
+            .ReturnsAsync((Setor?)null);
 
         var service = new SetoresService(repo.Object);
 
         var act = () => service.ObterPorIdAsync(99);
 
         await act.Should().ThrowAsync<KeyNotFoundException>()
-            .WithMessage("Setor não encontrado.");
+            .WithMessage("Setor não encontrada.");
     }
 
     [Fact]
     public async Task CriarAsync_ShouldRejectDuplicateName()
     {
         var repo = new Mock<ISetoresRepository>();
-        repo.Setup(r => r.BuscarPorNomeAsync("Setores A", It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new Setores { IdSetores = 1, Nome = "Setores A" });
+        repo.Setup(r => r.BuscarPorNomeAsync("Setor A", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Setor { Id = 1, Nome = "Setor A" });
 
         var service = new SetoresService(repo.Object);
-        var dto = new CriarSetoresDto("Setores A", "Descricao");
+        var dto = new CriarSetoresDto("Setor A", "Descricao");
 
         var act = () => service.CriarAsync(dto);
 
         await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("Já existe um setor cadastrada com este nome");
+            .WithMessage("Já existe um setor cadastrado com este nome");
 
-        repo.Verify(r => r.CriarAsync(It.IsAny<Setores>(), It.IsAny<CancellationToken>()), Times.Never);
+        repo.Verify(r => r.CriarAsync(It.IsAny<Setor>(), It.IsAny<CancellationToken>()), Times.Never);
         repo.Verify(r => r.SalvarAlteracoesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -75,13 +75,13 @@ public class SetoresServiceTests
     public async Task CriarAsync_ShouldCreateAndPersistSetor()
     {
         var repo = new Mock<ISetoresRepository>();
-        var dto = new CriarSetoreDto("Setores A", "Descricao");
+        var dto = new CriarSetoresDto("Setor A", "Descricao");
 
         repo.Setup(r => r.BuscarPorNomeAsync(dto.Nome, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Setores?)null);
+            .ReturnsAsync((Setor?)null);
 
-        repo.Setup(r => r.CriarAsync(It.IsAny<Setores>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Setores c, CancellationToken _) => c);
+        repo.Setup(r => r.CriarAsync(It.IsAny<Setor>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Setor c, CancellationToken _) => c);
 
         repo.Setup(r => r.SalvarAlteracoesAsync(It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
@@ -90,19 +90,19 @@ public class SetoresServiceTests
 
         var result = await service.CriarAsync(dto);
 
-        result.Nome.Should().Be("Comunidade A");
+        result.Nome.Should().Be("Setor A");
 
-        repo.Verify(r => r.CriarAsync(It.IsAny<Setores>(), It.IsAny<CancellationToken>()), Times.Once);
+        repo.Verify(r => r.CriarAsync(It.IsAny<Setor>(), It.IsAny<CancellationToken>()), Times.Once);
         repo.Verify(r => r.SalvarAlteracoesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public async Task AtualizarAsync_ShouldUpdateAndPersistSetores()
+    public async Task AtualizarAsync_ShouldUpdateAndPersistSetor()
     {
-        var repo = new Mock<IComunidadeRepository>();
-        var entidade = new Setores
+        var repo = new Mock<ISetoresRepository>();
+        var entidade = new Setor
         {
-            IdSetores = 1,
+            Id = 1,
             Nome = "Antigo",
             Descricao = "Antiga",
             Ativo = true,
@@ -135,9 +135,10 @@ public class SetoresServiceTests
     public async Task AlternarAtivoAsync_ShouldToggleAndPersist()
     {
         var repo = new Mock<ISetoresRepository>();
-        var entidade = new Setores {
-            IdSetores = 1,
-            Nome = "Setores A",
+        var entidade = new Setor
+        {
+            Id = 1,
+            Nome = "Setor A",
             Descricao = "Descricao",
             Ativo = true,
             DataCriacao = DateTime.UtcNow

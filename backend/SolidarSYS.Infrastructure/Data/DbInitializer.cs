@@ -23,6 +23,7 @@ public static class DbInitializer
         // SQLite pode deixar um arquivo já existente sem todas as tabelas em dev local.stentes.
         await EnsureCommunityTableExistsAsync(db);
         await EnsureBeneficiariosTableExistsAsync(db);
+        await EnsureVisitasTableExistsAsync(db);
         await EnsureDoadoresTablesExistAsync(db);
 
         await SeedAsync(db);
@@ -78,6 +79,24 @@ public static class DbInitializer
         );
         CREATE UNIQUE INDEX IF NOT EXISTS ix_beneficiarios_cpf ON beneficiarios(cpf);");
 }
+
+    private static async Task EnsureVisitasTableExistsAsync(SolidarSysDbContext db)
+    {
+        if (db.Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            return;
+
+        await db.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE IF NOT EXISTS visitas (
+                id_visita INTEGER PRIMARY KEY AUTOINCREMENT,
+                id_beneficiario INTEGER NOT NULL,
+                data_visita TEXT NOT NULL,
+                responsavel TEXT NOT NULL,
+                observacoes TEXT,
+                data_cadastro TEXT NOT NULL,
+                FOREIGN KEY (id_beneficiario) REFERENCES beneficiarios(id_beneficiario)
+            );
+            CREATE UNIQUE INDEX IF NOT EXISTS ix_visitas_beneficiario_data ON visitas(id_beneficiario, data_visita); ");
+    }
 
     private static async Task EnsureDoadoresTablesExistAsync(SolidarSysDbContext db)
     {
@@ -343,6 +362,137 @@ public static class DbInitializer
 
             await db.SaveChangesAsync();
             await EnsureBeneficiariosTableExistsAsync(db);
+        }
+
+        var comunidadeParaBeneficiarios = await db.Comunidades.FirstOrDefaultAsync(c => c.Ativa);
+        if (comunidadeParaBeneficiarios is not null)
+        {
+            var beneficiariosDemo = new[]
+            {
+                new Beneficiario
+                {
+                    Nome = "Maria Silva",
+                    Cpf = "12345678909",
+                    DataNascimento = new DateOnly(1986, 4, 8),
+                    Endereco = "Rua da Esperança, 120",
+                    TotalMembrosFamilia = 3,
+                    Ativo = true,
+                    DataCriacao = DateTime.UtcNow,
+                },
+                new Beneficiario
+                {
+                    Nome = "João Santos",
+                    Cpf = "98765432100",
+                    DataNascimento = new DateOnly(1978, 7, 14),
+                    Endereco = "Av. Brasil, 44",
+                    TotalMembrosFamilia = 2,
+                    Ativo = true,
+                    DataCriacao = DateTime.UtcNow,
+                },
+                new Beneficiario
+                {
+                    Nome = "Carlos Souza",
+                    Cpf = "45678912355",
+                    DataNascimento = new DateOnly(1989, 11, 20),
+                    Endereco = "Rua das Flores, 320",
+                    TotalMembrosFamilia = 4,
+                    Ativo = true,
+                    DataCriacao = DateTime.UtcNow,
+                },
+                new Beneficiario
+                {
+                    Nome = "Ana Oliveira",
+                    Cpf = "52998224725",
+                    DataNascimento = new DateOnly(1991, 2, 12),
+                    Endereco = "Rua das Acácias, 85",
+                    TotalMembrosFamilia = 3,
+                    Ativo = true,
+                    DataCriacao = DateTime.UtcNow,
+                },
+                new Beneficiario
+                {
+                    Nome = "Pedro Lima",
+                    Cpf = "93541134780",
+                    DataNascimento = new DateOnly(1983, 8, 21),
+                    Endereco = "Avenida Central, 240",
+                    TotalMembrosFamilia = 4,
+                    Ativo = true,
+                    DataCriacao = DateTime.UtcNow,
+                },
+                new Beneficiario
+                {
+                    Nome = "Luciana Ferreira",
+                    Cpf = "11144477735",
+                    DataNascimento = new DateOnly(1975, 6, 3),
+                    Endereco = "Rua Bela Vista, 17",
+                    TotalMembrosFamilia = 2,
+                    Ativo = true,
+                    DataCriacao = DateTime.UtcNow,
+                },
+                new Beneficiario
+                {
+                    Nome = "Rafael Costa",
+                    Cpf = "39053344705",
+                    DataNascimento = new DateOnly(1994, 12, 16),
+                    Endereco = "Travessa das Palmeiras, 62",
+                    TotalMembrosFamilia = 5,
+                    Ativo = true,
+                    DataCriacao = DateTime.UtcNow,
+                },
+                new Beneficiario
+                {
+                    Nome = "Beatriz Almeida",
+                    Cpf = "16899535009",
+                    DataNascimento = new DateOnly(1988, 3, 29),
+                    Endereco = "Rua do Sol, 311",
+                    TotalMembrosFamilia = 3,
+                    Ativo = true,
+                    DataCriacao = DateTime.UtcNow,
+                },
+            };
+
+            foreach (var beneficiario in beneficiariosDemo)
+            {
+                if (!await db.Beneficiarios.AnyAsync(b => b.Cpf == beneficiario.Cpf))
+                {
+                    beneficiario.IdComunidade = comunidadeParaBeneficiarios.IdComunidade;
+                    db.Beneficiarios.Add(beneficiario);
+                }
+            }
+
+            await db.SaveChangesAsync();
+        }
+
+        var beneficiariosParaVisitas = await db.Beneficiarios.OrderBy(b => b.Nome).ToListAsync();
+        if (beneficiariosParaVisitas.Count > 0)
+        {
+            var visitasDemo = new[]
+            {
+                (DataVisita: new DateOnly(2024, 9, 30), Responsavel: "Paula Gestora", Observacoes: "Visita de rotina. Família em boas condições."),
+                (DataVisita: new DateOnly(2024, 10, 4), Responsavel: "Marcos Operador", Observacoes: "Entrega de cestas básicas."),
+                (DataVisita: new DateOnly(2024, 11, 10), Responsavel: "Paula Gestora", Observacoes: "Acompanhamento pós-visita."),
+            };
+
+            foreach (var (visitaDemo, indice) in visitasDemo.Select((visita, indice) => (visita, indice)))
+            {
+                var beneficiario = beneficiariosParaVisitas[indice % beneficiariosParaVisitas.Count];
+                var jaExiste = await db.Visitas.AnyAsync(v =>
+                    v.IdBeneficiario == beneficiario.IdBeneficiario && v.DataVisita == visitaDemo.DataVisita);
+
+                if (!jaExiste)
+                {
+                    db.Visitas.Add(new Visita
+                    {
+                        IdBeneficiario = beneficiario.IdBeneficiario,
+                        DataVisita = visitaDemo.DataVisita,
+                        Responsavel = visitaDemo.Responsavel,
+                        Observacoes = visitaDemo.Observacoes,
+                        DataCadastro = DateTime.UtcNow,
+                    });
+                }
+            }
+
+            await db.SaveChangesAsync();
         }
 
         if (!await db.Doadores.AnyAsync())
