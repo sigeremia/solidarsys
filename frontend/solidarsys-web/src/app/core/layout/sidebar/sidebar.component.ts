@@ -12,7 +12,7 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Dashboard',     icon: 'pi-home',        route: '/dashboard' },
+  { label: 'Início',        icon: 'pi-home',        route: '/dashboard' },
   { label: 'Beneficiários', icon: 'pi-users',       route: '/beneficiarios', roles: ['ADMINISTRADOR', 'GESTOR', 'OPERADOR'] },
   { label: 'Doadores',      icon: 'pi-heart',       route: '/doadores',      roles: ['ADMINISTRADOR', 'GESTOR'] },
   { label: 'Visitas',       icon: 'pi-calendar',    route: '/visitas' },

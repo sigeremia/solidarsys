@@ -515,6 +515,42 @@ public static class DbInitializer
             }
 
             await db.SaveChangesAsync();
+
+            var comunidadesDistribuicao = await db.Comunidades
+                .Where(c => c.Ativa && new[]
+                    {
+                        "Casa da Cidadania",
+                        "Ponte Solidária",
+                        "Aliança do Ba",
+                        "Conexão Viva",
+                        "Rede de Apoio",
+                    }.Contains(c.Nome))
+                .OrderBy(c => c.Nome)
+                .ToListAsync();
+
+            if (comunidadesDistribuicao.Count == 5)
+            {
+                var beneficiariosDistribuicao = await db.Beneficiarios
+                    .Where(b => b.Ativo)
+                    .OrderBy(b => b.Nome)
+                    .ToListAsync();
+
+                for (var indice = 0; indice < beneficiariosDistribuicao.Count; indice++)
+                {
+                    beneficiariosDistribuicao[indice].IdComunidade =
+                        comunidadesDistribuicao[indice % comunidadesDistribuicao.Count].IdComunidade;
+                }
+
+                await db.SaveChangesAsync();
+
+                foreach (var comunidade in await db.Comunidades.ToListAsync())
+                {
+                    comunidade.TotalBeneficiarios = await db.Beneficiarios
+                        .CountAsync(b => b.IdComunidade == comunidade.IdComunidade && b.Ativo);
+                }
+
+                await db.SaveChangesAsync();
+            }
         }
 
         var beneficiariosParaVisitas = await db.Beneficiarios.OrderBy(b => b.Nome).ToListAsync();
