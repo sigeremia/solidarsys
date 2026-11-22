@@ -10,4 +10,5 @@ public interface IBeneficiarioService
     Task<BeneficiarioListItemDto> AtualizarAsync(int id, AtualizarBeneficiarioDto dto, CancellationToken ct = default);
     Task InativarAsync(int id, CancellationToken ct = default);
     Task<IList<ComunidadeOpcaoDto>> ListarComunidadesAsync(CancellationToken ct = default);
+    Task<IList<BeneficiarioMapaDto>> ListarMapaAsync(CancellationToken ct = default);
 }

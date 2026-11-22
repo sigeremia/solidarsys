@@ -1,0 +1,51 @@
+<section class="p-6">
+  <header class="flex items-center justify-between mb-3">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800">Mapa de Localização dos Beneficiários</h1>
+      <p class="text-slate-500 text-sm mt-0.5">Visualize os endereços cadastrados no mapa</p>
+    </div>
+  </header>
+
+  <div class="mapa-panel relative rounded-xl border border-slate-200 overflow-hidden bg-white">
+    <div id="mapa-beneficiarios"></div>
+
+    @if (carregando()) {
+      <div class="absolute inset-0 z-[1000] flex items-center justify-center bg-white/70">
+        <span class="text-sm text-slate-600">Carregando mapa e beneficiários...</span>
+      </div>
+    }
+
+    @if (erro()) {
+      <div class="absolute left-4 right-4 top-4 z-[1000] rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+        {{ erro() }}
+      </div>
+    }
+  </div>
+
+  <section class="beneficiarios-panel" aria-label="Beneficiários localizados">
+    <header class="beneficiarios-panel-header">
+      <h2>Beneficiários no mapa</h2>
+      <span>{{ carregando() ? 'Carregando...' : beneficiarios().length + ' localizados' }}</span>
+    </header>
+
+    @if (!carregando() && !erro() && beneficiarios().length === 0) {
+      <div class="beneficiarios-empty">
+        Nenhum beneficiário possui coordenadas cadastradas.
+      </div>
+    }
+
+    @if (beneficiarios().length > 0) {
+      <div class="beneficiarios-grid">
+        @for (beneficiario of beneficiarios(); track beneficiario.idBeneficiario) {
+          <article class="beneficiario-card">
+            <h3>{{ beneficiario.nome }}</h3>
+            <p>
+              <i class="pi pi-map-marker" aria-hidden="true"></i>
+              {{ beneficiario.endereco }}
+            </p>
+          </article>
+        }
+      </div>
+    }
+  </section>
+</section>

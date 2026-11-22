@@ -48,6 +48,7 @@ export class BeneficiarioFormComponent implements OnChanges {
   comunidades = signal<ComunidadeOpcao[]>([]);
   carregando = signal(false);
   erro = signal<string | null>(null);
+  avisoGeocodificacao = signal<string | null>(null);
 
   hoje = new Date().toISOString().split('T')[0];
 
@@ -55,6 +56,7 @@ export class BeneficiarioFormComponent implements OnChanges {
 
   ngOnChanges(): void {
     this.erro.set(null);
+    this.avisoGeocodificacao.set(null);
     this.construirForm();
     if (this.aberto) this.carregarComunidades();
   }
@@ -104,7 +106,17 @@ export class BeneficiarioFormComponent implements OnChanges {
       : this.service.criar(payload);
 
     obs.subscribe({
-      next: () => { this.carregando.set(false); this.salvo.emit(); },
+      next: beneficiario => {
+        this.carregando.set(false);
+        if (beneficiario.latitude == null || beneficiario.longitude == null) {
+          this.avisoGeocodificacao.set(
+            'O endereço não pôde ser localizado no mapa. Corrija o endereço e salve novamente para atualizar as coordenadas.'
+          );
+          this.erro.set(null);
+        } else {
+          this.salvo.emit();
+        }
+      },
       error: e => {
         this.erro.set(this.extrairMensagemErro(e));
         this.carregando.set(false);

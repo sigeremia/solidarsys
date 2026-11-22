@@ -85,6 +85,31 @@ CREATE TABLE IF NOT EXISTS doacoes (
     data_cadastro TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS comunidades (
+    id_comunidade      SERIAL PRIMARY KEY,
+    nome               VARCHAR(150) NOT NULL,
+    regiao             VARCHAR(150) NOT NULL,
+    descricao          TEXT,
+    data_criacao       TIMESTAMPTZ NOT NULL,
+    ativa              BOOLEAN NOT NULL DEFAULT TRUE,
+    total_beneficiarios INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS beneficiarios (
+    id_beneficiario      SERIAL PRIMARY KEY,
+    nome                 VARCHAR(150) NOT NULL,
+    cpf                  CHAR(11) NOT NULL,
+    data_nascimento      DATE NOT NULL,
+    endereco             VARCHAR(255) NOT NULL,
+    latitude             DOUBLE PRECISION,
+    longitude            DOUBLE PRECISION,
+    id_comunidade        INT NOT NULL REFERENCES comunidades(id_comunidade),
+    total_membros_familia INTEGER NOT NULL DEFAULT 0,
+    ativo                BOOLEAN NOT NULL DEFAULT TRUE,
+    data_criacao         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_beneficiarios_cpf UNIQUE (cpf)
+);
+
 -- Índices
 CREATE INDEX IF NOT EXISTS idx_usuarios_email      ON usuarios(email);
 CREATE INDEX IF NOT EXISTS idx_usuarios_cpf        ON usuarios(cpf);
@@ -108,3 +133,118 @@ SELECT
     '00000000000',
     TRUE
 WHERE NOT EXISTS (SELECT 1 FROM usuarios WHERE email = 'admin@solidarsys.org');
+
+-- Comunidade e beneficiários iniciais de Caxias do Sul / RS
+INSERT INTO comunidades (nome, regiao, descricao, data_criacao, ativa, total_beneficiarios)
+SELECT
+    'Comunidade Esperança',
+    'Caxias do Sul / RS',
+    'Apoio a famílias em vulnerabilidade com cestas básicas e atendimento social.',
+    '2024-01-12 00:00:00+00',
+    TRUE,
+    8
+WHERE NOT EXISTS (SELECT 1 FROM comunidades WHERE nome = 'Comunidade Esperança');
+
+INSERT INTO beneficiarios (
+    nome, cpf, data_nascimento, endereco, latitude, longitude,
+    id_comunidade, total_membros_familia, ativo, data_criacao
+)
+SELECT 'Maria Silva', '12345678909', '1986-04-08',
+       'Rua Marechal Floriano, 120, Caxias do Sul - RS', -29.1629373, -51.1843351,
+       id_comunidade, 3, TRUE, NOW()
+FROM comunidades WHERE nome = 'Comunidade Esperança'
+ON CONFLICT (cpf) DO UPDATE SET
+    endereco = EXCLUDED.endereco,
+    latitude = EXCLUDED.latitude,
+    longitude = EXCLUDED.longitude;
+
+INSERT INTO beneficiarios (
+    nome, cpf, data_nascimento, endereco, latitude, longitude,
+    id_comunidade, total_membros_familia, ativo, data_criacao
+)
+SELECT 'João Santos', '98765432100', '1978-07-14',
+       'Rua Ludovico Cavinatto, 44, Caxias do Sul - RS', -29.1450474, -51.1971040,
+       id_comunidade, 2, TRUE, NOW()
+FROM comunidades WHERE nome = 'Comunidade Esperança'
+ON CONFLICT (cpf) DO UPDATE SET
+    endereco = EXCLUDED.endereco,
+    latitude = EXCLUDED.latitude,
+    longitude = EXCLUDED.longitude;
+
+INSERT INTO beneficiarios (
+    nome, cpf, data_nascimento, endereco, latitude, longitude,
+    id_comunidade, total_membros_familia, ativo, data_criacao
+)
+SELECT 'Carlos Souza', '45678912355', '1989-11-20',
+       'Rua Sinimbu, 320, Caxias do Sul - RS', -29.1687605, -51.1759491,
+       id_comunidade, 4, TRUE, NOW()
+FROM comunidades WHERE nome = 'Comunidade Esperança'
+ON CONFLICT (cpf) DO UPDATE SET
+    endereco = EXCLUDED.endereco,
+    latitude = EXCLUDED.latitude,
+    longitude = EXCLUDED.longitude;
+
+INSERT INTO beneficiarios (
+    nome, cpf, data_nascimento, endereco, latitude, longitude,
+    id_comunidade, total_membros_familia, ativo, data_criacao
+)
+SELECT 'Ana Oliveira', '52998224725', '1991-02-12',
+       'Rua Moreira César, 85, Caxias do Sul - RS', -29.1664518, -51.1855844,
+       id_comunidade, 3, TRUE, NOW()
+FROM comunidades WHERE nome = 'Comunidade Esperança'
+ON CONFLICT (cpf) DO UPDATE SET
+    endereco = EXCLUDED.endereco,
+    latitude = EXCLUDED.latitude,
+    longitude = EXCLUDED.longitude;
+
+INSERT INTO beneficiarios (
+    nome, cpf, data_nascimento, endereco, latitude, longitude,
+    id_comunidade, total_membros_familia, ativo, data_criacao
+)
+SELECT 'Pedro Lima', '93541134780', '1983-08-21',
+       'Avenida Júlio de Castilhos, 240, Caxias do Sul - RS', -29.1677185, -51.1717769,
+       id_comunidade, 4, TRUE, NOW()
+FROM comunidades WHERE nome = 'Comunidade Esperança'
+ON CONFLICT (cpf) DO UPDATE SET
+    endereco = EXCLUDED.endereco,
+    latitude = EXCLUDED.latitude,
+    longitude = EXCLUDED.longitude;
+
+INSERT INTO beneficiarios (
+    nome, cpf, data_nascimento, endereco, latitude, longitude,
+    id_comunidade, total_membros_familia, ativo, data_criacao
+)
+SELECT 'Luciana Ferreira', '11144477735', '1975-06-03',
+       'Rua Pinheiro Machado, 17, Caxias do Sul - RS', -29.1670341, -51.1904197,
+       id_comunidade, 2, TRUE, NOW()
+FROM comunidades WHERE nome = 'Comunidade Esperança'
+ON CONFLICT (cpf) DO UPDATE SET
+    endereco = EXCLUDED.endereco,
+    latitude = EXCLUDED.latitude,
+    longitude = EXCLUDED.longitude;
+
+INSERT INTO beneficiarios (
+    nome, cpf, data_nascimento, endereco, latitude, longitude,
+    id_comunidade, total_membros_familia, ativo, data_criacao
+)
+SELECT 'Rafael Costa', '39053344705', '1994-12-16',
+       'Rua Plácido de Castro, 62, Caxias do Sul - RS', -29.1717178, -51.1663002,
+       id_comunidade, 5, TRUE, NOW()
+FROM comunidades WHERE nome = 'Comunidade Esperança'
+ON CONFLICT (cpf) DO UPDATE SET
+    endereco = EXCLUDED.endereco,
+    latitude = EXCLUDED.latitude,
+    longitude = EXCLUDED.longitude;
+
+INSERT INTO beneficiarios (
+    nome, cpf, data_nascimento, endereco, latitude, longitude,
+    id_comunidade, total_membros_familia, ativo, data_criacao
+)
+SELECT 'Beatriz Almeida', '16899535009', '1988-03-29',
+       'Rua Garibaldi, 311, Caxias do Sul - RS', -29.1647308, -51.1828916,
+       id_comunidade, 3, TRUE, NOW()
+FROM comunidades WHERE nome = 'Comunidade Esperança'
+ON CONFLICT (cpf) DO UPDATE SET
+    endereco = EXCLUDED.endereco,
+    latitude = EXCLUDED.latitude,
+    longitude = EXCLUDED.longitude;

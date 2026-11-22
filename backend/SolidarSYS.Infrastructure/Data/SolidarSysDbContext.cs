@@ -140,6 +140,8 @@ public class SolidarSysDbContext(DbContextOptions<SolidarSysDbContext> options) 
            e.Property(b => b.Cpf).HasColumnName("cpf").HasMaxLength(11).IsRequired();
            e.Property(b => b.DataNascimento).HasColumnName("data_nascimento").IsRequired();
            e.Property(b => b.Endereco).HasColumnName("endereco").HasMaxLength(255).IsRequired();
+           e.Property(b => b.Latitude).HasColumnName("latitude");
+           e.Property(b => b.Longitude).HasColumnName("longitude");
            e.Property(b => b.IdComunidade).HasColumnName("id_comunidade").IsRequired();
            e.Property(b => b.TotalMembrosFamilia).HasColumnName("total_membros_familia").IsRequired();
            e.Property(b => b.Ativo).HasColumnName("ativo").IsRequired();

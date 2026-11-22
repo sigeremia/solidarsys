@@ -4,7 +4,9 @@ using SolidarSYS.Domain.Entities;
 
 namespace SolidarSYS.Application.Beneficiarios.Services;
 
-public class BeneficiarioService(IBeneficiarioRepository repo) : IBeneficiarioService
+public class BeneficiarioService(
+    IBeneficiarioRepository repo,
+    IGeocodificacaoService geocodificacao) : IBeneficiarioService
 {
     public async Task<PagedResultDto<BeneficiarioListItemDto>> ListarAsync(
         int pagina, int tamanhoPagina, string? busca, bool? ativo, CancellationToken ct = default)
@@ -42,6 +44,8 @@ public class BeneficiarioService(IBeneficiarioRepository repo) : IBeneficiarioSe
             DataCriacao = DateTime.UtcNow,
         };
 
+        await AplicarGeocodificacaoAsync(beneficiario, beneficiario.Endereco, ct);
+
         await repo.AdicionarAsync(beneficiario, ct);
         await repo.SalvarAlteracoesAsync(ct);
         await repo.AtualizarTotalBeneficiariosAsync(comunidade.IdComunidade, ct);
@@ -56,6 +60,7 @@ public class BeneficiarioService(IBeneficiarioRepository repo) : IBeneficiarioSe
 
         var cpf = SomenteDigitos(dto.Cpf);
         var idComunidadeAnterior = beneficiario.IdComunidade;
+        var enderecoAnterior = beneficiario.Endereco;
 
         // Permite manter a comunidade atual mesmo que ela tenha sido inativada depois.
         var comunidade = dto.IdComunidade == idComunidadeAnterior
@@ -72,6 +77,9 @@ public class BeneficiarioService(IBeneficiarioRepository repo) : IBeneficiarioSe
         beneficiario.Endereco = dto.Endereco.Trim();
         beneficiario.IdComunidade = comunidade.IdComunidade;
         beneficiario.Comunidade = comunidade;
+
+        if (!string.Equals(enderecoAnterior, beneficiario.Endereco, StringComparison.Ordinal))
+            await AplicarGeocodificacaoAsync(beneficiario, beneficiario.Endereco, ct);
 
         await repo.SalvarAlteracoesAsync(ct);
 
@@ -101,6 +109,20 @@ public class BeneficiarioService(IBeneficiarioRepository repo) : IBeneficiarioSe
         return comunidades.Select(c => new ComunidadeOpcaoDto(c.IdComunidade, c.Nome)).ToList();
     }
 
+    public async Task<IList<BeneficiarioMapaDto>> ListarMapaAsync(CancellationToken ct = default)
+    {
+        var beneficiarios = await repo.ListarComCoordenadasAsync(ct);
+        return beneficiarios
+            .Where(b => b.Latitude.HasValue && b.Longitude.HasValue)
+            .Select(b => new BeneficiarioMapaDto(
+                b.IdBeneficiario,
+                b.Nome,
+                b.Endereco,
+                b.Latitude!.Value,
+                b.Longitude!.Value))
+            .ToList();
+    }
+
     private async Task<Comunidade> ObterComunidadeAtivaAsync(int idComunidade, CancellationToken ct)
     {
         var comunidade = await repo.ObterComunidadeAsync(idComunidade, ct)
@@ -115,8 +137,23 @@ public class BeneficiarioService(IBeneficiarioRepository repo) : IBeneficiarioSe
     private static string SomenteDigitos(string valor) =>
         new(valor.Where(char.IsDigit).ToArray());
 
+    private async Task AplicarGeocodificacaoAsync(Beneficiario beneficiario, string endereco, CancellationToken ct)
+    {
+        var coordenadas = await geocodificacao.GeocodificarAsync(endereco, ct);
+        if (coordenadas is null)
+        {
+            beneficiario.Latitude = null;
+            beneficiario.Longitude = null;
+            return;
+        }
+
+        beneficiario.Latitude = coordenadas.Value.Latitude;
+        beneficiario.Longitude = coordenadas.Value.Longitude;
+    }
+
     private static BeneficiarioListItemDto Mapear(Beneficiario b) =>
         new(b.IdBeneficiario, b.Nome, b.Cpf, b.DataNascimento, b.Endereco,
+            b.Latitude, b.Longitude,
             b.IdComunidade, b.Comunidade?.Nome ?? string.Empty,
             b.TotalMembrosFamilia, b.Ativo, b.DataCriacao);
 }

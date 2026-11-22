@@ -42,6 +42,7 @@
 
 /* Sizing */
 .min-h-screen { min-height: 100vh; }
+.h-screen { height: 100vh; }
 .w-full { width: 100%; }
 .max-w-md { max-width: 28rem; }
 .max-w-sm { max-width: 24rem; }
@@ -142,8 +143,8 @@
 .hover\:bg-slate-800:hover { background-color: #1e293b; }
 
 /* Typography */
-.text-xs { font-size: 0.75rem; line-height: 1rem; }
-.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.text-xs { font-size: 0.75rem; line-height: 0.75rem; }
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; text-decoration: initial; }
 .text-base { font-size: 1rem; line-height: 1.5rem; }
 .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
 .text-2xl { font-size: 1.5rem; line-height: 2rem; }
@@ -174,5 +175,6 @@
 @media (min-width: 1024px) {
   .lg\:hidden { display: none; }
   .lg\:relative { position: relative; }
+  .lg\:h-screen { height: 100vh; }
   .lg\:translate-x-0 { transform: translateX(0); }
 }

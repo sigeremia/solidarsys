@@ -73,4 +73,10 @@ public class BeneficiarioRepository(SolidarSysDbContext db) : IBeneficiarioRepos
 
         await db.SaveChangesAsync(ct);
     }
+
+    public async Task<IList<Beneficiario>> ListarComCoordenadasAsync(CancellationToken ct = default) =>
+        await db.Beneficiarios
+            .Where(b => b.Latitude.HasValue && b.Longitude.HasValue)
+            .OrderBy(b => b.Nome)
+            .ToListAsync(ct);
 }

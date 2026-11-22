@@ -13,4 +13,5 @@ public interface IBeneficiarioRepository
     Task<Comunidade?> ObterComunidadeAsync(int idComunidade, CancellationToken ct = default);
     Task<IList<Comunidade>> ListarComunidadesAtivasAsync(CancellationToken ct = default);
     Task AtualizarTotalBeneficiariosAsync(int idComunidade, CancellationToken ct = default);
+    Task<IList<Beneficiario>> ListarComCoordenadasAsync(CancellationToken ct = default);
 }

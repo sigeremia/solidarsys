@@ -61,6 +61,14 @@ namespace SolidarSYS.Infrastructure.Data.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("id_comunidade");
 
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("latitude");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("longitude");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -476,6 +484,45 @@ namespace SolidarSYS.Infrastructure.Data.Migrations
                     b.ToTable("usuarios", (string)null);
                 });
 
+            modelBuilder.Entity("SolidarSYS.Domain.Entities.Visita", b =>
+                {
+                    b.Property<int>("IdVisita")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id_visita");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdVisita"));
+
+                    b.Property<DateTime>("DataCadastro")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("data_cadastro");
+
+                    b.Property<DateOnly>("DataVisita")
+                        .HasColumnType("date")
+                        .HasColumnName("data_visita");
+
+                    b.Property<int>("IdBeneficiario")
+                        .HasColumnType("integer")
+                        .HasColumnName("id_beneficiario");
+
+                    b.Property<string>("Observacoes")
+                        .HasColumnType("text")
+                        .HasColumnName("observacoes");
+
+                    b.Property<string>("Responsavel")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("responsavel");
+
+                    b.HasKey("IdVisita");
+
+                    b.HasIndex("IdBeneficiario", "DataVisita")
+                        .IsUnique();
+
+                    b.ToTable("visitas", (string)null);
+                });
+
             modelBuilder.Entity("SolidarSYS.Domain.Entities.Beneficiario", b =>
                 {
                     b.HasOne("SolidarSYS.Domain.Entities.Comunidade", "Comunidade")
@@ -546,6 +593,17 @@ namespace SolidarSYS.Infrastructure.Data.Migrations
                         .HasForeignKey("IdSetor");
 
                     b.Navigation("Setor");
+                });
+
+            modelBuilder.Entity("SolidarSYS.Domain.Entities.Visita", b =>
+                {
+                    b.HasOne("SolidarSYS.Domain.Entities.Beneficiario", "Beneficiario")
+                        .WithMany()
+                        .HasForeignKey("IdBeneficiario")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Beneficiario");
                 });
 
             modelBuilder.Entity("SolidarSYS.Domain.Entities.Doador", b =>

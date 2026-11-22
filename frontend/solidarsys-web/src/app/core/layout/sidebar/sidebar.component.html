@@ -12,7 +12,7 @@
 
 <!-- Sidebar -->
 <aside
-  class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 flex flex-col transition-transform duration-300 lg:relative lg:translate-x-0"
+  class="fixed inset-y-0 left-0 z-40 w-64 h-screen bg-slate-900 flex flex-col transition-transform duration-300 lg:relative lg:h-screen lg:translate-x-0"
   [class.-translate-x-full]="!mobileAberta()"
   [class.translate-x-0]="mobileAberta()">
 
@@ -57,7 +57,7 @@
     </div>
     <button
       (click)="sair()"
-      class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors text-sm">
+      class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-slate-800 hover:bg-slate-800 hover:text-white transition-colors text-sm">
       <i class="pi pi-sign-out text-base"></i>
       Sair
     </button>

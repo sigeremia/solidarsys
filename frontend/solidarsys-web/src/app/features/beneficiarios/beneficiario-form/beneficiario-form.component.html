@@ -10,6 +10,10 @@
     <p-message severity="error" [text]="erro()!" styleClass="w-full mb-4" />
   }
 
+  @if (avisoGeocodificacao()) {
+    <p-message severity="warn" [text]="avisoGeocodificacao()!" styleClass="w-full mb-4" />
+  }
+
   <form [formGroup]="form" novalidate class="flex flex-col gap-4 pt-2" (ngSubmit)="salvar()">
 
     <!-- Nome -->

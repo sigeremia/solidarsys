@@ -7,6 +7,8 @@ public class Beneficiario
     public string Cpf { get; set; } = string.Empty;
     public DateOnly DataNascimento { get; set; }
     public string Endereco { get; set; } = string.Empty;
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
     public int IdComunidade { get; set; }
     public int TotalMembrosFamilia { get; set; }
     public bool Ativo { get; set; } = true;

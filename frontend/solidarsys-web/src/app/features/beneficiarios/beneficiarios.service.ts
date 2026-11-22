@@ -8,6 +8,7 @@ import {
   ComunidadeOpcao,
   CriarBeneficiarioRequest,
   PagedResult,
+  BeneficiarioMapa,
 } from './models/beneficiario.model';
 
 @Injectable({ providedIn: 'root' })
@@ -31,6 +32,10 @@ export class BeneficiariosService {
 
   listarComunidades(): Observable<ComunidadeOpcao[]> {
     return this.http.get<ComunidadeOpcao[]>(`${this.url}/comunidades`);
+  }
+
+  listarMapa(): Observable<BeneficiarioMapa[]> {
+    return this.http.get<BeneficiarioMapa[]>(`${this.url}/mapa`);
   }
 
   criar(dto: CriarBeneficiarioRequest): Observable<BeneficiarioListItem> {

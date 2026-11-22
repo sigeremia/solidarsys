@@ -4,6 +4,8 @@ export interface BeneficiarioListItem {
   cpf: string;
   dataNascimento: string;
   endereco: string;
+  latitude?: number | null;
+  longitude?: number | null;
   idComunidade: number;
   comunidade: string;
   totalMembrosFamilia: number;
@@ -21,6 +23,14 @@ export interface PagedResult<T> {
 export interface ComunidadeOpcao {
   idComunidade: number;
   nome: string;
+}
+
+export interface BeneficiarioMapa {
+  idBeneficiario: number;
+  nome: string;
+  endereco: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface CriarBeneficiarioRequest {

@@ -6,6 +6,8 @@ public record BeneficiarioListItemDto(
     string Cpf,
     DateOnly DataNascimento,
     string Endereco,
+    double? Latitude,
+    double? Longitude,
     int IdComunidade,
     string Comunidade,
     int TotalMembrosFamilia,

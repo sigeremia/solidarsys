@@ -61,16 +61,18 @@ public static class DbInitializer
     }
     private static async Task EnsureBeneficiariosTableExistsAsync(SolidarSysDbContext db)
     {
-    if (db.Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
-        return;
+        if (db.Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            return;
 
-    await db.Database.ExecuteSqlRawAsync(@"
+        await db.Database.ExecuteSqlRawAsync(@"
         CREATE TABLE IF NOT EXISTS beneficiarios (
             id_beneficiario INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
             cpf TEXT NOT NULL,
             data_nascimento TEXT NOT NULL,
             endereco TEXT NOT NULL,
+            latitude REAL,
+            longitude REAL,
             id_comunidade INTEGER NOT NULL,
             total_membros_familia INTEGER NOT NULL,
             ativo INTEGER NOT NULL,
@@ -78,7 +80,36 @@ public static class DbInitializer
             FOREIGN KEY (id_comunidade) REFERENCES comunidades(id_comunidade)
         );
         CREATE UNIQUE INDEX IF NOT EXISTS ix_beneficiarios_cpf ON beneficiarios(cpf);");
-}
+
+        await AdicionarColunaSqliteSeAusenteAsync(db, "latitude");
+        await AdicionarColunaSqliteSeAusenteAsync(db, "longitude");
+    }
+
+    private static async Task AdicionarColunaSqliteSeAusenteAsync(
+        SolidarSysDbContext db,
+        string nomeColuna)
+    {
+        var connection = db.Database.GetDbConnection();
+        var estavaAberta = connection.State == System.Data.ConnectionState.Open;
+        if (!estavaAberta)
+            await connection.OpenAsync();
+
+        await using var command = connection.CreateCommand();
+        command.CommandText =
+            $"SELECT COUNT(*) FROM pragma_table_info('beneficiarios') WHERE name = '{nomeColuna}'";
+        var quantidade = Convert.ToInt32(await command.ExecuteScalarAsync());
+
+        if (quantidade == 0)
+        {
+            if (nomeColuna == "latitude")
+                await db.Database.ExecuteSqlRawAsync("ALTER TABLE beneficiarios ADD COLUMN latitude REAL");
+            else
+                await db.Database.ExecuteSqlRawAsync("ALTER TABLE beneficiarios ADD COLUMN longitude REAL");
+        }
+
+        if (!estavaAberta)
+            await connection.CloseAsync();
+    }
 
     private static async Task EnsureVisitasTableExistsAsync(SolidarSysDbContext db)
     {
@@ -226,7 +257,7 @@ public static class DbInitializer
                 new Comunidade
                 {
                     Nome = "Comunidade Esperança",
-                    Regiao = "São Paulo / SP",
+                    Regiao = "Caxias do Sul / RS",
                     Descricao = "Apoio a famílias em vulnerabilidade com cestas básicas e atendimento social.",
                     DataCriacao = new DateTime(2024, 1, 12, 0, 0, 0, DateTimeKind.Utc),
                     Ativa = true,
@@ -374,7 +405,9 @@ public static class DbInitializer
                     Nome = "Maria Silva",
                     Cpf = "12345678909",
                     DataNascimento = new DateOnly(1986, 4, 8),
-                    Endereco = "Rua da Esperança, 120",
+                    Endereco = "Rua Marechal Floriano, 120, Caxias do Sul - RS",
+                    Latitude = -29.1629373,
+                    Longitude = -51.1843351,
                     TotalMembrosFamilia = 3,
                     Ativo = true,
                     DataCriacao = DateTime.UtcNow,
@@ -384,7 +417,9 @@ public static class DbInitializer
                     Nome = "João Santos",
                     Cpf = "98765432100",
                     DataNascimento = new DateOnly(1978, 7, 14),
-                    Endereco = "Av. Brasil, 44",
+                    Endereco = "Rua Ludovico Cavinatto, 44, Caxias do Sul - RS",
+                    Latitude = -29.1450474,
+                    Longitude = -51.1971040,
                     TotalMembrosFamilia = 2,
                     Ativo = true,
                     DataCriacao = DateTime.UtcNow,
@@ -394,7 +429,9 @@ public static class DbInitializer
                     Nome = "Carlos Souza",
                     Cpf = "45678912355",
                     DataNascimento = new DateOnly(1989, 11, 20),
-                    Endereco = "Rua das Flores, 320",
+                    Endereco = "Rua Sinimbu, 320, Caxias do Sul - RS",
+                    Latitude = -29.1687605,
+                    Longitude = -51.1759491,
                     TotalMembrosFamilia = 4,
                     Ativo = true,
                     DataCriacao = DateTime.UtcNow,
@@ -404,7 +441,9 @@ public static class DbInitializer
                     Nome = "Ana Oliveira",
                     Cpf = "52998224725",
                     DataNascimento = new DateOnly(1991, 2, 12),
-                    Endereco = "Rua das Acácias, 85",
+                    Endereco = "Rua Moreira César, 85, Caxias do Sul - RS",
+                    Latitude = -29.1664518,
+                    Longitude = -51.1855844,
                     TotalMembrosFamilia = 3,
                     Ativo = true,
                     DataCriacao = DateTime.UtcNow,
@@ -414,7 +453,9 @@ public static class DbInitializer
                     Nome = "Pedro Lima",
                     Cpf = "93541134780",
                     DataNascimento = new DateOnly(1983, 8, 21),
-                    Endereco = "Avenida Central, 240",
+                    Endereco = "Avenida Júlio de Castilhos, 240, Caxias do Sul - RS",
+                    Latitude = -29.1677185,
+                    Longitude = -51.1717769,
                     TotalMembrosFamilia = 4,
                     Ativo = true,
                     DataCriacao = DateTime.UtcNow,
@@ -424,7 +465,9 @@ public static class DbInitializer
                     Nome = "Luciana Ferreira",
                     Cpf = "11144477735",
                     DataNascimento = new DateOnly(1975, 6, 3),
-                    Endereco = "Rua Bela Vista, 17",
+                    Endereco = "Rua Pinheiro Machado, 17, Caxias do Sul - RS",
+                    Latitude = -29.1670341,
+                    Longitude = -51.1904197,
                     TotalMembrosFamilia = 2,
                     Ativo = true,
                     DataCriacao = DateTime.UtcNow,
@@ -434,7 +477,9 @@ public static class DbInitializer
                     Nome = "Rafael Costa",
                     Cpf = "39053344705",
                     DataNascimento = new DateOnly(1994, 12, 16),
-                    Endereco = "Travessa das Palmeiras, 62",
+                    Endereco = "Rua Plácido de Castro, 62, Caxias do Sul - RS",
+                    Latitude = -29.1717178,
+                    Longitude = -51.1663002,
                     TotalMembrosFamilia = 5,
                     Ativo = true,
                     DataCriacao = DateTime.UtcNow,
@@ -444,7 +489,9 @@ public static class DbInitializer
                     Nome = "Beatriz Almeida",
                     Cpf = "16899535009",
                     DataNascimento = new DateOnly(1988, 3, 29),
-                    Endereco = "Rua do Sol, 311",
+                    Endereco = "Rua Garibaldi, 311, Caxias do Sul - RS",
+                    Latitude = -29.1647308,
+                    Longitude = -51.1828916,
                     TotalMembrosFamilia = 3,
                     Ativo = true,
                     DataCriacao = DateTime.UtcNow,
@@ -453,10 +500,17 @@ public static class DbInitializer
 
             foreach (var beneficiario in beneficiariosDemo)
             {
-                if (!await db.Beneficiarios.AnyAsync(b => b.Cpf == beneficiario.Cpf))
+                var existente = await db.Beneficiarios.FirstOrDefaultAsync(b => b.Cpf == beneficiario.Cpf);
+                if (existente is null)
                 {
                     beneficiario.IdComunidade = comunidadeParaBeneficiarios.IdComunidade;
                     db.Beneficiarios.Add(beneficiario);
+                }
+                else
+                {
+                    existente.Endereco = beneficiario.Endereco;
+                    existente.Latitude = beneficiario.Latitude;
+                    existente.Longitude = beneficiario.Longitude;
                 }
             }
 

@@ -30,6 +30,13 @@ public class BeneficiariosController(IBeneficiarioService beneficiarioService) :
         return Ok(comunidades);
     }
 
+    [HttpGet("mapa")]
+    public async Task<IActionResult> ListarMapa(CancellationToken ct)
+    {
+        var pontos = await beneficiarioService.ListarMapaAsync(ct);
+        return Ok(pontos);
+    }
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> ObterPorId(int id, CancellationToken ct)
     {

@@ -30,6 +30,7 @@ using SolidarSYS.Application.Doadores.Interfaces;
 using SolidarSYS.Application.Doadores.Services;
 using SolidarSYS.Application.Visitas.Interfaces;
 using SolidarSYS.Application.Visitas.Services;
+using SolidarSYS.Infrastructure.Beneficiarios;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,6 +70,7 @@ builder.Services.AddScoped<IComunidadeService, ComunidadeService>();
 builder.Services.AddScoped<ISetoresService, SetoresService>();
 builder.Services.AddScoped<IBeneficiarioRepository, BeneficiarioRepository>();
 builder.Services.AddScoped<IBeneficiarioService, BeneficiarioService>();
+builder.Services.AddHttpClient<IGeocodificacaoService, NominatimGeocodificacaoService>();
 builder.Services.AddScoped<IVisitaRepository, VisitaRepository>();
 builder.Services.AddScoped<IVisitaService, VisitaService>();
 builder.Services.AddScoped<IDoadorRepository, DoadorRepository>();
