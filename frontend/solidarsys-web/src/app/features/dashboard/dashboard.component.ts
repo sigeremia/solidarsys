@@ -1,16 +1,13 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { forkJoin, catchError, of } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
-import { BeneficiariosService } from '../beneficiarios/beneficiarios.service';
-import { DoadoresService } from '../doadores/doadores.service';
-import { VisitasService } from '../visitas/visitas.service';
-import { ComunidadesService } from '../comunidades/comunidades.service';
+import { DashboardService } from './dashboard.service';
+import { ComunidadeResumo, DashboardResumo } from './models/dashboard.model';
 
 interface MonthlyData {
   label: string;
   beneficiarios: number;
-  doacoes: number;
+  doadores: number | null;
 }
 
 @Component({
@@ -55,16 +52,20 @@ interface MonthlyData {
                     <span class="bar-tooltip">
                       <strong>{{ item.label }}</strong>
                       <span>Beneficiários: {{ item.beneficiarios }}</span>
-                      <span>Doadores: {{ item.doacoes }}</span>
+                      @if (item.doadores !== null) {
+                        <span>Doadores: {{ item.doadores }}</span>
+                      }
                     </span>
                   </div>
-                  <div class="bar bar-secondary" [style.height.%]="alturaBarra(item.doacoes)">
-                    <span class="bar-tooltip">
-                      <strong>{{ item.label }}</strong>
-                      <span>Beneficiários: {{ item.beneficiarios }}</span>
-                      <span>Doadores: {{ item.doacoes }}</span>
-                    </span>
-                  </div>
+                  @if (item.doadores !== null) {
+                    <div class="bar bar-secondary" [style.height.%]="alturaBarra(item.doadores)">
+                      <span class="bar-tooltip">
+                        <strong>{{ item.label }}</strong>
+                        <span>Beneficiários: {{ item.beneficiarios }}</span>
+                        <span>Doadores: {{ item.doadores }}</span>
+                      </span>
+                    </div>
+                  }
                 </div>
                 <span>{{ item.label }}</span>
               </div>
@@ -100,7 +101,7 @@ interface MonthlyData {
     .dashboard-header h1 { margin: 0 0 4px; color: #1e293b; font-size: 24px; font-weight: 800; }
     .dashboard-header p { margin: 0; color: #64748b; font-size: 14px; }
     .error-banner { margin-bottom: 16px; border: 1px solid #fecaca; border-radius: 10px; background: #fef2f2; color: #b91c1c; padding: 10px 12px; font-size: 13px; }
-    .summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; margin-bottom: 24px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 24px; }
     .summary-card { position: relative; min-height: 128px; display: flex; align-items: flex-start; justify-content: space-between; padding: 22px 20px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 2px 8px rgba(15,23,42,.05); }
     .summary-label { margin: 0 0 12px; color: #64748b; font-size: 14px; }
     .summary-value { margin: 0; color: #1e293b; font-size: 24px; line-height: 1; font-weight: 800; }
@@ -151,19 +152,16 @@ interface MonthlyData {
 })
 export class DashboardComponent implements OnInit {
   auth = inject(AuthService);
-  private beneficiariosService = inject(BeneficiariosService);
-  private doadoresService = inject(DoadoresService);
-  private visitasService = inject(VisitasService);
-  private comunidadesService = inject(ComunidadesService);
+  private dashboardService = inject(DashboardService);
   private changeDetectorRef = inject(ChangeDetectorRef);
 
   nomeSistema = 'SolidarSYS';
   carregando = true;
   erroCarregamento = false;
   totalComunidades = 0;
-  comunidades: { nome: string; totalBeneficiarios: number }[] = [];
+  comunidades: ComunidadeResumo[] = [];
   evolucaoMensal: MonthlyData[] = [];
-  donutGradient = 'conic-gradient(#14b8a6 0 100%)';
+  donutGradient = 'conic-gradient(#e2e8f0 0 100%)';
 
   cards = [
     { label: 'Beneficiários', value: 0, icon: 'pi-heart', iconClass: 'icon-teal' },
@@ -173,69 +171,54 @@ export class DashboardComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    forkJoin({
-      beneficiarios: this.beneficiariosService.listar(1, 100).pipe(catchError(() => { this.erroCarregamento = true; return of({ total: 0, items: [] } as { total: number; items: { dataCriacao: string }[] }); })),
-      doadores: this.doadoresService.listar(1, 100).pipe(catchError(() => { this.erroCarregamento = true; return of({ total: 0, items: [] } as { total: number; items: { dataCadastro: string }[] }); })),
-      visitas: this.visitasService.listar(1, 100).pipe(catchError(() => { this.erroCarregamento = true; return of({ total: 0, items: [] } as { total: number; items: { dataVisita: string }[] }); })),
-      comunidades: this.comunidadesService.listar(1, 100).pipe(catchError(() => { this.erroCarregamento = true; return of({ total: 0, items: [] } as { total: number; items: { nome: string; totalBeneficiarios: number }[] }); })),
-    }).subscribe(({ beneficiarios, doadores, visitas, comunidades }) => {
-      this.cards[0].value = beneficiarios.total;
-      this.cards[1].value = doadores.total;
-      this.cards[3].value = comunidades.total;
-      this.totalComunidades = comunidades.total;
-      this.comunidades = comunidades.items;
-      this.donutGradient = this.gerarGradienteDoNut(comunidades.items);
-
-      const hoje = new Date();
-      this.cards[2].value = visitas.items.filter(item => {
-        const data = new Date(item.dataVisita);
-        return data.getMonth() === hoje.getMonth() && data.getFullYear() === hoje.getFullYear();
-      }).length;
-
-      this.evolucaoMensal = this.gerarEvolucaoMensal(beneficiarios.items, doadores.items);
-      this.carregando = false;
-      this.changeDetectorRef.markForCheck();
+    this.dashboardService.obter().subscribe({
+      next: resumo => {
+        this.aplicar(resumo);
+        this.carregando = false;
+        this.changeDetectorRef.markForCheck();
+      },
+      error: () => {
+        this.erroCarregamento = true;
+        this.carregando = false;
+        this.changeDetectorRef.markForCheck();
+      },
     });
   }
 
   alturaBarra(valor: number): number {
-    const maior = Math.max(...this.evolucaoMensal.map(item => Math.max(item.beneficiarios, item.doacoes)), 1);
+    const maior = Math.max(
+      ...this.evolucaoMensal.map(item => Math.max(item.beneficiarios, item.doadores ?? 0)),
+      1,
+    );
     return Math.max(4, (valor / maior) * 100);
   }
 
-  private gerarEvolucaoMensal(
-    beneficiarios: { dataCriacao: string }[],
-    doadores: { dataCadastro: string }[],
-  ): MonthlyData[] {
-    const hoje = new Date();
-    const resultado: MonthlyData[] = [];
+  private aplicar(resumo: DashboardResumo): void {
+    // OPERADOR não tem acesso a doadores: o card some em vez de mostrar 0
+    this.cards = [
+      { label: 'Beneficiários', value: resumo.totalBeneficiarios, icon: 'pi-heart', iconClass: 'icon-teal' },
+      ...(resumo.totalDoadores === null
+        ? []
+        : [{ label: 'Doadores', value: resumo.totalDoadores, icon: 'pi-users', iconClass: 'icon-orange' }]),
+      { label: 'Visitas este mês', value: resumo.visitasMes, icon: 'pi-calendar', iconClass: 'icon-blue' },
+      { label: 'Comunidades', value: resumo.totalComunidades, icon: 'pi-map-marker', iconClass: 'icon-green' },
+    ];
+
+    this.totalComunidades = resumo.totalComunidades;
+    this.comunidades = resumo.comunidades;
+    this.donutGradient = this.gerarGradienteDoNut(resumo.comunidades);
+
     const nomesMeses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-
-    for (let offset = 5; offset >= 0; offset--) {
-      const data = new Date(hoje.getFullYear(), hoje.getMonth() - offset, 1);
-      const beneficiariosMes = beneficiarios.filter(item => {
-        const cadastro = new Date(item.dataCriacao);
-        return cadastro.getMonth() === data.getMonth() && cadastro.getFullYear() === data.getFullYear();
-      }).length;
-
-      const doadoresMes = doadores.filter(item => {
-        const cadastro = new Date(`${item.dataCadastro}T00:00:00`);
-        return cadastro.getMonth() === data.getMonth() && cadastro.getFullYear() === data.getFullYear();
-      }).length;
-
-      resultado.push({
-        label: nomesMeses[data.getMonth()],
-        beneficiarios: beneficiariosMes,
-        doacoes: doadoresMes,
-      });
-    }
-
-    return resultado;
+    this.evolucaoMensal = resumo.evolucaoMensal.map(m => ({
+      label: nomesMeses[m.mes - 1],
+      beneficiarios: m.beneficiarios,
+      doadores: m.doadores,
+    }));
   }
 
-  private gerarGradienteDoNut(comunidades: { nome: string; totalBeneficiarios: number }[]): string {
+  private gerarGradienteDoNut(comunidades: ComunidadeResumo[]): string {
     const total = comunidades.reduce((soma, item) => soma + (item.totalBeneficiarios || 0), 0);
-    if (total <= 0) return 'conic-gradient(#14b8a6 0 100%)';
+    if (total <= 0) return 'conic-gradient(#e2e8f0 0 100%)';
 
     const cores = ['#14b8a6', '#3b82f6', '#f59e0b', '#22c55e', '#a855f7', '#ec4899'];
     let inicio = 0;
