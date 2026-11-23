@@ -32,3 +32,29 @@ select,
 textarea {
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
+
+/* Impressão / exportação em PDF da tela de Relatórios.
+   A classe é adicionada ao <body> apenas durante a impressão (ver RelatoriosComponent.exportarPdf). */
+@media print {
+  @page { margin: 12mm; }
+
+  body.imprimindo-relatorio {
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body.imprimindo-relatorio app-sidebar {
+    display: none !important;
+  }
+
+  body.imprimindo-relatorio app-main-layout > div {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  body.imprimindo-relatorio main {
+    overflow: visible !important;
+  }
+}

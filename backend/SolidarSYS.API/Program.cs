@@ -30,6 +30,8 @@ using SolidarSYS.Application.Dashboard.Interfaces;
 using SolidarSYS.Application.Dashboard.Services;
 using SolidarSYS.Application.Doadores.Interfaces;
 using SolidarSYS.Application.Doadores.Services;
+using SolidarSYS.Application.Relatorios.Interfaces;
+using SolidarSYS.Application.Relatorios.Services;
 using SolidarSYS.Application.Visitas.Interfaces;
 using SolidarSYS.Application.Visitas.Services;
 using SolidarSYS.Infrastructure.Beneficiarios;
@@ -79,6 +81,8 @@ builder.Services.AddScoped<IDoadorRepository, DoadorRepository>();
 builder.Services.AddScoped<IDoadorService, DoadorService>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IRelatorioRepository, RelatorioRepository>();
+builder.Services.AddScoped<IRelatorioService, RelatorioService>();
 
 
 // ───── JWT Authentication ─────

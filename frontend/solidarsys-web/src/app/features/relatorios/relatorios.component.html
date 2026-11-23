@@ -1,0 +1,205 @@
+<section class="relatorios" [class.atualizando]="carregando() && !!dados()">
+  <!-- Cabeçalho exibido apenas na impressão / exportação em PDF -->
+  <div class="impressao-cabecalho">
+    <p class="impressao-marca">SolidarSYS · Gestão social</p>
+    <h2>Relatório de Indicadores</h2>
+    @if (dados(); as d) {
+      <p>Período: {{ rotuloPeriodo(d.periodo) }} ({{ intervalo(d) }})</p>
+    }
+    <p>Gerado em {{ geradoEm() }} por {{ auth.usuario()?.nome }}</p>
+  </div>
+
+  <header class="relatorios-header">
+    <div>
+      <h1 class="text-2xl font-bolder text-slate-800">Relatórios</h1>
+      <p class="text-slate-500 text-sm mt-0.5">Análises e indicadores</p>
+    </div>
+
+    <div class="filtros">
+      <p-select
+        class="filtro-periodo"
+        [options]="opcoesPeriodo"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="periodo()"
+        (ngModelChange)="alterarPeriodo($event)"
+        ariaLabel="Período do relatório"
+        appendTo="body" />
+
+      <div class="acoes-exportar">
+        <p-button
+          label="CSV"
+          icon="pi pi-file-excel"
+          severity="secondary"
+          [outlined]="true"
+          [disabled]="!dados()"
+          pTooltip="Exportar em CSV"
+          tooltipPosition="bottom"
+          (onClick)="exportarCsv()" />
+        <p-button
+          label="PDF"
+          icon="pi pi-file-pdf"
+          severity="secondary"
+          [outlined]="true"
+          [disabled]="!dados()"
+          pTooltip="Exportar em PDF"
+          tooltipPosition="bottom"
+          (onClick)="exportarPdf()" />
+      </div>
+    </div>
+  </header>
+
+  @if (erro()) {
+    <div class="banner banner-erro" role="alert">{{ erro() }}</div>
+  }
+
+  @if (dados()?.semDados) {
+    <div class="banner banner-info" role="status">
+      {{ semDadosNoSistema() ? 'Ainda não há dados cadastrados no sistema para gerar os indicadores.' : mensagemSemDados }}
+    </div>
+  }
+
+  <section class="indicadores" aria-label="Indicadores gerais">
+    @for (card of cards(); track card.rotulo) {
+      <article class="card card-indicador">
+        <p class="indicador-rotulo">{{ card.rotulo }}</p>
+        <p [class]="'indicador-valor ' + card.classe">{{ card.valor }}</p>
+        @if (card.dica) {
+          <p class="indicador-dica">{{ card.dica }}</p>
+        }
+      </article>
+    }
+  </section>
+
+  <section class="graficos">
+    <!-- Beneficiários cadastrados -->
+    <article class="card card-grafico">
+      <h2>{{ tituloBarras() }}</h2>
+      <div class="grafico-area" #caixaBarras>
+        @if (barras(); as g) {
+          <svg
+            class="grafico-svg"
+            [attr.viewBox]="'0 0 ' + g.largura + ' ' + g.altura"
+            role="img"
+            [attr.aria-label]="'Gráfico de barras: ' + tituloBarras()">
+            @for (grade of g.grades; track $index) {
+              <line class="grade" [attr.x1]="g.margens.esq" [attr.x2]="g.largura - g.margens.dir" [attr.y1]="grade.y" [attr.y2]="grade.y" />
+              <text class="eixo-texto" text-anchor="end" [attr.x]="g.margens.esq - 8" [attr.y]="grade.y + 4">{{ grade.rotulo }}</text>
+            }
+            <line class="eixo" [attr.x1]="g.margens.esq" [attr.x2]="g.margens.esq" [attr.y1]="g.margens.topo" [attr.y2]="g.altura - g.margens.base" />
+            <line class="eixo" [attr.x1]="g.margens.esq" [attr.x2]="g.largura - g.margens.dir" [attr.y1]="g.altura - g.margens.base" [attr.y2]="g.altura - g.margens.base" />
+
+            @for (barra of g.barras; track $index) {
+              <g class="barra-grupo">
+                <rect class="barra-hit" [attr.x]="barra.colunaX" [attr.y]="g.margens.topo" [attr.width]="barra.colunaLargura" [attr.height]="g.altura - g.margens.topo - g.margens.base" />
+                <path class="barra" [attr.d]="barra.caminho" />
+                <title>{{ barra.dica }}</title>
+              </g>
+            }
+
+            @for (rotulo of g.rotulosX; track $index) {
+              <text class="eixo-texto" text-anchor="middle" [attr.x]="rotulo.x" [attr.y]="g.altura - g.margens.base + 18">{{ rotulo.texto }}</text>
+            }
+          </svg>
+          @if (g.vazio) {
+            <p class="grafico-sem-dados">{{ mensagemSemDados }}</p>
+          }
+        } @else {
+          <p class="grafico-aviso">{{ carregando() ? 'Carregando...' : '' }}</p>
+        }
+      </div>
+    </article>
+
+    <!-- Volume de doações -->
+    <article class="card card-grafico">
+      <h2>Volume de Doações (R$)</h2>
+      <div class="grafico-area" #caixaLinha>
+        @if (linha(); as g) {
+          <svg
+            class="grafico-svg"
+            [attr.viewBox]="'0 0 ' + g.largura + ' ' + g.altura"
+            role="img"
+            aria-label="Gráfico de linha: volume de doações em reais">
+            @for (grade of g.grades; track $index) {
+              <line class="grade" [attr.x1]="g.margens.esq" [attr.x2]="g.largura - g.margens.dir" [attr.y1]="grade.y" [attr.y2]="grade.y" />
+              <text class="eixo-texto" text-anchor="end" [attr.x]="g.margens.esq - 8" [attr.y]="grade.y + 4">{{ grade.rotulo }}</text>
+            }
+            <line class="eixo" [attr.x1]="g.margens.esq" [attr.x2]="g.margens.esq" [attr.y1]="g.margens.topo" [attr.y2]="g.altura - g.margens.base" />
+            <line class="eixo" [attr.x1]="g.margens.esq" [attr.x2]="g.largura - g.margens.dir" [attr.y1]="g.altura - g.margens.base" [attr.y2]="g.altura - g.margens.base" />
+
+            @if (!g.vazio) {
+              <path class="linha" [attr.d]="g.caminho" />
+            }
+
+            @for (ponto of g.pontos; track $index) {
+              <g class="ponto-grupo">
+                <circle class="ponto-hit" [attr.cx]="ponto.x" [attr.cy]="ponto.y" r="10" />
+                @if (g.mostrarMarcadores) {
+                  <circle class="ponto" [attr.cx]="ponto.x" [attr.cy]="ponto.y" r="3.5" />
+                }
+                <title>{{ ponto.dica }}</title>
+              </g>
+            }
+
+            @for (rotulo of g.rotulosX; track $index) {
+              <text class="eixo-texto" text-anchor="middle" [attr.x]="rotulo.x" [attr.y]="g.altura - g.margens.base + 18">{{ rotulo.texto }}</text>
+            }
+          </svg>
+          @if (g.vazio) {
+            <p class="grafico-sem-dados">{{ mensagemSemDados }}</p>
+          }
+        } @else {
+          <p class="grafico-aviso">{{ carregando() ? 'Carregando...' : '' }}</p>
+        }
+      </div>
+    </article>
+
+    <!-- Distribuição por comunidade -->
+    <article class="card card-grafico card-pizza">
+      <h2>Distribuição por Comunidade</h2>
+      <div class="grafico-area" #caixaPizza>
+        @if (pizza(); as g) {
+          <svg
+            class="grafico-svg"
+            [attr.viewBox]="'0 0 ' + g.largura + ' ' + g.altura"
+            role="img"
+            aria-label="Gráfico de pizza: distribuição de beneficiários por comunidade">
+            @if (g.vazio) {
+              <circle class="pizza-vazia" [attr.cx]="g.cx" [attr.cy]="g.cy" [attr.r]="g.raio" />
+            }
+            @for (fatia of g.fatias; track $index) {
+              <g class="fatia-grupo">
+                @if (fatia.cheia) {
+                  <circle class="fatia" [attr.cx]="g.cx" [attr.cy]="g.cy" [attr.r]="g.raio" [attr.fill]="fatia.cor" />
+                } @else {
+                  <path class="fatia" [attr.d]="fatia.caminho" [attr.fill]="fatia.cor" />
+                }
+                <title>{{ fatia.dica }}</title>
+              </g>
+              @if (g.rotulosExternos) {
+                <polyline class="fatia-linha" [attr.points]="fatia.linha" [attr.stroke]="fatia.cor" />
+                <text class="fatia-rotulo" [attr.x]="fatia.rotuloX" [attr.y]="fatia.rotuloY" [attr.text-anchor]="fatia.ancora" [attr.fill]="fatia.cor">{{ fatia.rotulo }}</text>
+              }
+            }
+          </svg>
+
+          @if (g.vazio) {
+            <p class="grafico-sem-dados">Nenhum beneficiário cadastrado.</p>
+          } @else if (!g.rotulosExternos) {
+            <ul class="legenda">
+              @for (fatia of g.fatias; track $index) {
+                <li>
+                  <span class="legenda-cor" [style.background]="fatia.cor"></span>
+                  <span class="legenda-nome">{{ fatia.nome }}</span>
+                  <span class="legenda-valor">{{ fatia.total }} ({{ fatia.percentual }}%)</span>
+                </li>
+              }
+            </ul>
+          }
+        } @else {
+          <p class="grafico-aviso">{{ carregando() ? 'Carregando...' : '' }}</p>
+        }
+      </div>
+    </article>
+  </section>
+</section>

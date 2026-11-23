@@ -1,0 +1,379 @@
+:host {
+  display: block;
+  min-height: 100%;
+  /* Layout responsivo pela largura real da área de conteúdo (descontando o menu lateral) */
+  container-type: inline-size;
+}
+
+.relatorios {
+  min-height: 100%;
+  padding: 1.5rem;
+  transition: opacity 150ms;
+}
+
+.relatorios.atualizando {
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+/* ───── Cabeçalho e filtros ───── */
+.relatorios-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.filtros {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filtro-periodo {
+  width: 11.5rem;
+}
+
+.acoes-exportar {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ───── Avisos ───── */
+.banner {
+  margin-bottom: 1rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid;
+  border-radius: 0.625rem;
+  font-size: 0.8125rem;
+}
+
+.banner-erro {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.banner-info {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+/* ───── Cards ───── */
+.card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+}
+
+.indicadores {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.card-indicador {
+  padding: 1rem 1.25rem 1.125rem;
+}
+
+.indicador-rotulo {
+  margin: 0 0 0.5rem;
+  color: #64748b;
+  font-size: 0.8125rem;
+}
+
+.indicador-valor {
+  margin: 0;
+  font-size: 1.75rem;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.indicador-dica {
+  margin: 0.5rem 0 0;
+  color: #94a3b8;
+  font-size: 0.6875rem;
+}
+
+.valor-teal {
+  color: #0d9488;
+}
+
+.valor-laranja {
+  color: #f59e0b;
+}
+
+.valor-azul {
+  color: #2563eb;
+}
+
+/* ───── Gráficos ───── */
+.graficos {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+.card-grafico {
+  padding: 1.25rem;
+  min-width: 0;
+  break-inside: avoid;
+}
+
+.card-grafico h2 {
+  margin: 0 0 0.75rem;
+  color: #1e293b;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.grafico-area {
+  position: relative;
+  width: 100%;
+  min-height: 15rem;
+}
+
+.grafico-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.grafico-aviso,
+.grafico-sem-dados {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.8125rem;
+  text-align: center;
+}
+
+.grafico-aviso {
+  padding-top: 6rem;
+}
+
+/* Mensagem centralizada sobre o gráfico vazio */
+.grafico-sem-dados {
+  position: absolute;
+  top: 45%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.card-pizza .grafico-sem-dados {
+  top: 50%;
+}
+
+.grade {
+  stroke: #eef2f7;
+  stroke-dasharray: 3 3;
+}
+
+.eixo {
+  stroke: #cbd5e1;
+}
+
+.eixo-texto {
+  fill: #64748b;
+  font-size: 11px;
+}
+
+.barra {
+  fill: #14b8a6;
+  transition: fill 120ms;
+}
+
+.barra-hit,
+.ponto-hit {
+  fill: transparent;
+}
+
+.barra-grupo:hover .barra {
+  fill: #0d9488;
+}
+
+.linha {
+  fill: none;
+  stroke: #f59e0b;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.ponto {
+  fill: #fff;
+  stroke: #f59e0b;
+  stroke-width: 2;
+}
+
+.ponto-grupo:hover .ponto {
+  fill: #f59e0b;
+}
+
+.fatia {
+  stroke: #fff;
+  stroke-width: 2;
+  transition: opacity 120ms;
+}
+
+.fatia-grupo:hover .fatia {
+  opacity: 0.85;
+}
+
+.fatia-linha {
+  fill: none;
+  stroke-width: 1;
+  opacity: 0.6;
+}
+
+.fatia-rotulo {
+  font-size: 12px;
+}
+
+.pizza-vazia {
+  fill: #f1f5f9;
+  stroke: #e2e8f0;
+  stroke-width: 2;
+}
+
+.legenda {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.5rem 1rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legenda li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.legenda-cor {
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.legenda-nome {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legenda-valor {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: #334155;
+  font-weight: 600;
+}
+
+/* ───── Cabeçalho de impressão (oculto na tela) ───── */
+.impressao-cabecalho {
+  display: none;
+}
+
+/* ───── Responsivo (pela largura da área de conteúdo) ───── */
+@container (max-width: 639px) {
+  .relatorios {
+    padding: 1.25rem 1rem;
+  }
+
+  .relatorios-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filtros {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filtro-periodo {
+    width: 100%;
+  }
+
+  .acoes-exportar {
+    justify-content: stretch;
+  }
+
+  .acoes-exportar > * {
+    flex: 1;
+  }
+}
+
+/* Abaixo de 1024px o menu vira gaveta e o botão hambúrguer fica fixo sobre o canto superior esquerdo */
+@media (max-width: 1023px) {
+  .relatorios-header {
+    padding-top: 2.75rem;
+  }
+}
+
+@container (min-width: 640px) {
+  .indicadores {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 760px) {
+  .graficos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .card-pizza {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ───── Impressão / PDF ───── */
+@media print {
+  .relatorios {
+    padding: 0;
+  }
+
+  .relatorios-header {
+    display: none;
+  }
+
+  .impressao-cabecalho {
+    display: block;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #14b8a6;
+  }
+
+  .impressao-cabecalho h2 {
+    margin: 0.25rem 0;
+    font-size: 1.5rem;
+    color: #1e293b;
+  }
+
+  .impressao-cabecalho p {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: #475569;
+  }
+
+  .impressao-marca {
+    font-weight: 700;
+    color: #0f766e !important;
+  }
+
+  .card {
+    box-shadow: none;
+  }
+
+  .indicadores {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
